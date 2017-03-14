@@ -5,6 +5,10 @@
  */
 package gabriel;
 
+import gabriel.Controller.Sender;
+import gabriel.Controller.Receiver;
+import gabriel.Controller.Introducer;
+import gabriel.models.Connection;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
@@ -42,15 +46,13 @@ public class Gabriel {
            mainIntroducer = new Introducer(connections,serverSocket);
            receiver = new Receiver();
            sender = new Sender();
+           mainIntroducer.checkHostsBruteForce("192.168.1");
            
            //TODO: A gui for user to choose request file. 
              
         } catch (IOException ex) {
             Logger.getLogger(Gabriel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-        
     }
     
 }

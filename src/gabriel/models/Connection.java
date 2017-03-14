@@ -3,7 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gabriel;
+package gabriel.models;
+
+import java.net.Socket;
 
 /**
  *
@@ -12,12 +14,19 @@ package gabriel;
  */
 public class Connection implements Runnable{
 
+    Socket connectionSocket;
+
+    public Connection(Socket connectionSocket) {
+        this.connectionSocket = connectionSocket;
+    }
+
+    
     
     
     
     @Override
     public void run() {
-    
+        
     }
     
     
