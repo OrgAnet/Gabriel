@@ -46,7 +46,7 @@ public class Gabriel {
            mainIntroducer = new Introducer(connections,serverSocket);
            receiver = new Receiver();
            sender = new Sender();
-           mainIntroducer.checkHostsBruteForce("192.168.1");
+           mainIntroducer.checkHostsx();
            
            //TODO: A gui for user to choose request file. 
              

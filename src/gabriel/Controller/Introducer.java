@@ -53,7 +53,6 @@ public class Introducer implements Runnable {
     }
 
     public void checkHostsBruteForce(String subnet) {
-
         //FIXME: This method is too slow.
         int timeout = 1000;
         for (int i = 1; i < 255; i++) {
@@ -74,11 +73,12 @@ public class Introducer implements Runnable {
             Enumeration nis = NetworkInterface.getNetworkInterfaces();
             while (nis.hasMoreElements()) {
                 NetworkInterface ni = (NetworkInterface) nis.nextElement();
+                
                 Enumeration ias = ni.getInetAddresses();
                 while (ias.hasMoreElements()) {
                     InetAddress ia = (InetAddress) ias.nextElement();
-
-                    System.out.println(ia.getHostName());
+                       
+                    System.out.println(ia.getHostAddress());
                 }
 
             }
