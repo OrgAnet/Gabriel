@@ -7,6 +7,7 @@ package gabriel.Controller;
 
 import gabriel.models.Connection;
 import java.io.IOException;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
@@ -28,6 +29,8 @@ public class Introducer implements Runnable {
     ArrayList<Connection> connections;
     ServerSocket serverSocket;
 
+    HostCheckerAll hostCheckerAll;
+
     public Introducer(ArrayList<Connection> connections, ServerSocket serverSocket) {
         this.connections = connections;
         this.serverSocket = serverSocket;
@@ -42,8 +45,8 @@ public class Introducer implements Runnable {
                 Socket connectionSocket = serverSocket.accept();
 
                 //TODO: Search for why we should use logger.
-                System.out.println("Node " + connectionSocket.getInetAddress() +
-                        ":" + connectionSocket.getPort() + " is connected.");
+                System.out.println("Node " + connectionSocket.getInetAddress()
+                        + ":" + connectionSocket.getPort() + " is connected.");
 
             } catch (IOException ex) {
                 Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
@@ -52,37 +55,33 @@ public class Introducer implements Runnable {
         }
     }
 
-    public void checkHostsBruteForce(String subnet) {
-        //FIXME: This method is too slow.
-        int timeout = 1000;
-        for (int i = 1; i < 255; i++) {
-            try {
-                String host = subnet + "." + i;
-                if (InetAddress.getByName(host).isReachable(timeout)) {
-                    System.out.println(host + " is reachable");
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+    public void checkHostsBruteForce(String subnet) throws InterruptedException {
+        hostCheckerAll = new HostCheckerAll(subnet, 255);
+        hostCheckerAll.start();
+
+        Thread.sleep(5000);
+        System.out.println("Introducer sleeped 5 seconds");
+
+        hostCheckerAll.getHostIps();
+        System.out.println(hostCheckerAll.getHostIps());
     }
 
-    public void checkHostsx() {
-        // faster solution but not exactly what we need.
+    public void checkHostTrial3() {
         try {
-            Enumeration nis = NetworkInterface.getNetworkInterfaces();
-            while (nis.hasMoreElements()) {
-                NetworkInterface ni = (NetworkInterface) nis.nextElement();
-                
-                Enumeration ias = ni.getInetAddresses();
-                while (ias.hasMoreElements()) {
-                    InetAddress ia = (InetAddress) ias.nextElement();
-                       
-                    System.out.println(ia.getHostAddress());
+            int timeout = 2000;
+            InetAddress[] addresses = InetAddress.getAllByName("localhost");
+            for (InetAddress address : addresses) {
+                if (address instanceof Inet4Address) {
+                    if (address.isReachable(timeout)) {
+                        System.out.printf("%s is reachable%n", address);
+                    } else {
+                        System.out.printf("%s could not be contacted%n", address);
+                    }
                 }
-
             }
-        } catch (SocketException ex) {
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
             Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

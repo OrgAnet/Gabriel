@@ -5,6 +5,7 @@
  */
 package gabriel.models;
 
+import java.net.Inet4Address;
 import java.net.Socket;
 
 /**
@@ -15,6 +16,7 @@ import java.net.Socket;
 public class Connection implements Runnable{
 
     Socket connectionSocket;
+    Inet4Address connectionIp;
 
     public Connection(Socket connectionSocket) {
         this.connectionSocket = connectionSocket;
