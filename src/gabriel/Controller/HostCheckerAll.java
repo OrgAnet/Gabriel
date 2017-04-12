@@ -5,8 +5,10 @@
  */
 package gabriel.Controller;
 
-
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,59 +20,50 @@ public class HostCheckerAll extends Thread {
 
     ArrayList<String> hostIps = new ArrayList<>();
     String subnet;
-    Integer hostCount;
+    Integer possibleHostCount;
 
-
-    public HostCheckerAll(String subnet, Integer hostCount) {
+    public HostCheckerAll(String subnet, Integer possibleHostCount) {
         this.subnet = subnet;
-        this.hostCount = hostCount;
+        this.possibleHostCount = possibleHostCount;
     }
 
     @Override
     public void run() {
 
-        String[] addresses = new String[hostCount];
-        for (int i = 0; i < hostCount; i++) {
+        HostChecker[] hostCheckers = new HostChecker[possibleHostCount];
+
+        String[] addresses = new String[possibleHostCount];
+        for (int i = 0; i < possibleHostCount; i++) {
             addresses[i] = subnet + "." + i;
         }
 
-        while (true) {
-
-            HostChecker[] hostCheckers = new HostChecker[hostCount];
-
-            for (int i = 0; i < hostCount; i++) {
+       // while (true) {
+            hostIps.clear();
+            ExecutorService executor = Executors.newFixedThreadPool(possibleHostCount);
+            for (int i = 0; i < possibleHostCount; i++) {
                 hostCheckers[i] = new HostChecker(addresses[i]);
+                executor.execute(hostCheckers[i]);
             }
-            for (int i = 0; i < hostCount; i++) {
-                hostCheckers[i].start();
+            executor.shutdown();
+            while (!executor.isTerminated()) {
             }
-            for (int i = 0; i < hostCount; i++) {
-                try {
-                    hostCheckers[i].join();
-                    if (hostCheckers[i].isValid && !hostIps.contains(hostCheckers[i].hostName)) {
-                        hostIps.add(hostCheckers[i].hostName);
-                        System.out.println("Host Ip: " + hostCheckers[i].hostName + " added");
-                    }
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
+            for (int i = 0; i < possibleHostCount; i++) {
+                if (hostCheckers[i].isValid && !hostIps.contains(hostCheckers[i].hostName)) {
+                    hostIps.add(hostCheckers[i].hostName);
+                    System.out.println("Host Ip: " + hostCheckers[i].hostName + " added");
                 }
             }
-            for (int i = 0; i < hostCount; i++) {
-                hostCheckers[i].interrupt();
-            }
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(HostCheckerAll.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+//            try {
+//                Thread.sleep(2000);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(HostCheckerAll.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+      //  }
 
     }
 
-    
-    
-    
     public ArrayList<String> getHostIps() {
+        //Collections.sort(hostIps);
         return hostIps;
     }
 
@@ -87,10 +80,10 @@ public class HostCheckerAll extends Thread {
     }
 
     public Integer getHostCount() {
-        return hostCount;
+        return possibleHostCount;
     }
 
     public void setHostCount(Integer hostCount) {
-        this.hostCount = hostCount;
+        this.possibleHostCount = hostCount;
     }
 }

@@ -5,7 +5,7 @@
  */
 package gabriel.Controller;
 
-import gabriel.models.Connection;
+import gabriel.models.Node;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -16,6 +16,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,12 +27,12 @@ import java.util.logging.Logger;
  */
 public class Introducer implements Runnable {
 
-    ArrayList<Connection> connections;
+    ArrayList<Node> connections;
     ServerSocket serverSocket;
 
     HostCheckerAll hostCheckerAll;
 
-    public Introducer(ArrayList<Connection> connections, ServerSocket serverSocket) {
+    public Introducer(ArrayList<Node> connections, ServerSocket serverSocket) {
         this.connections = connections;
         this.serverSocket = serverSocket;
     }
@@ -51,46 +52,29 @@ public class Introducer implements Runnable {
             } catch (IOException ex) {
                 Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         }
     }
 
-    public void checkHostsBruteForce(String subnet) throws InterruptedException {
+    public void checkHostsBruteForce(String subnet) {
         hostCheckerAll = new HostCheckerAll(subnet, 255);
         hostCheckerAll.start();
-
-        Thread.sleep(5000);
-        System.out.println("Introducer sleeped 5 seconds");
-
-        hostCheckerAll.getHostIps();
         System.out.println(hostCheckerAll.getHostIps());
     }
 
-    public void checkHostTrial3() {
-        try {
-            int timeout = 2000;
-            InetAddress[] addresses = InetAddress.getAllByName("localhost");
-            for (InetAddress address : addresses) {
-                if (address instanceof Inet4Address) {
-                    if (address.isReachable(timeout)) {
-                        System.out.printf("%s is reachable%n", address);
-                    } else {
-                        System.out.printf("%s could not be contacted%n", address);
-                    }
-                }
+    public ArrayList<Node> getConnections() {
+        connections=new ArrayList<>();
+        hostCheckerAll.getHostIps().forEach((hostIp) -> {
+            try {
+                Inet4Address ipAddress = (Inet4Address) Inet4Address.getByName(hostIp);
+                this.connections.add(new Node(ipAddress));
+            } catch (UnknownHostException ex) {
+                System.out.println("Error on Introducer.getConnections()!");
             }
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public ArrayList<Connection> getConnections() {
+        });
         return connections;
     }
 
-    public void setConnections(ArrayList<Connection> connections) {
+    public void setConnections(ArrayList<Node> connections) {
         this.connections = connections;
     }
 
