@@ -25,7 +25,7 @@ public class HostChecker extends Thread {
         int timeout = 2000;
         try {
             if (InetAddress.getByName(hostName).isReachable(timeout)) {
-                System.out.println(hostName + " is reachable");
+                System.out.println(hostName + " is reachable ");
                 isValid = true;
             }else
                 isValid=false;

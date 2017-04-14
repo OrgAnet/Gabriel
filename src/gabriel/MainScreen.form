@@ -26,10 +26,14 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="IpListesi" min="-2" pref="205" max="-2" attributes="0"/>
-                  <Component id="ScanNetwork" min="-2" max="-2" attributes="0"/>
+                  <Component id="ScanNetworkButton" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Component id="IpList" min="-2" pref="299" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
+                      <Component id="ConnectButton" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
-              <EmptySpace pref="277" max="32767" attributes="0"/>
+              <EmptySpace pref="172" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -37,24 +41,35 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="ScanNetwork" min="-2" max="-2" attributes="0"/>
+              <Component id="ScanNetworkButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
-              <Component id="IpListesi" min="-2" pref="199" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="IpList" min="-2" pref="199" max="-2" attributes="0"/>
+                  <Component id="ConnectButton" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace pref="31" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Component class="javax.swing.JButton" name="ScanNetwork">
+    <Component class="javax.swing.JButton" name="ScanNetworkButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="Refresh Network List"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ScanNetworkActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ScanNetworkButtonActionPerformed"/>
       </Events>
     </Component>
-    <Component class="java.awt.List" name="IpListesi">
+    <Component class="java.awt.List" name="IpList">
+    </Component>
+    <Component class="javax.swing.JButton" name="ConnectButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Connect"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ConnectButtonActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

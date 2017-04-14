@@ -10,7 +10,10 @@ import gabriel.Controller.Receiver;
 import gabriel.Controller.Introducer;
 import gabriel.models.Node;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.ServerSocket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,7 +29,7 @@ public class Gabriel {
     final static int RANDOM_PORT = 5000;
     String subnet = "192.168.1";
     
-    private ArrayList<Node> connections;
+    private ArrayList<Node> nodeList;
     private Introducer mainIntroducer;
     private ServerSocket serverSocket;
     private Receiver receiver;
@@ -34,43 +37,45 @@ public class Gabriel {
 
     public Gabriel() {
         try {
-            connections = new ArrayList<>();
+            nodeList = new ArrayList<>();
             serverSocket=new ServerSocket();
             sender = new Sender();
             receiver = new Receiver();
-            mainIntroducer=new Introducer(connections, serverSocket);
+            mainIntroducer=new Introducer(nodeList, serverSocket);
         } catch (IOException ex) {
             Logger.getLogger(Gabriel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-   
-    /**
-     * @param args the command line arguments
-     * @throws java.lang.InterruptedException
-     */
-//    public void main() {
-//
-//        try {
-//            serverSocket = new ServerSocket(RANDOM_PORT);
-//            mainIntroducer = new Introducer(connections, serverSocket);
-//            receiver = new Receiver();
-//            sender = new Sender();
-//            //mainIntroducer.checkHostsBruteForce();;
-//            
-//
-//            //TODO: A gui for user to choose request file. 
-//        } catch (IOException ex) {
-//            Logger.getLogger(Gabriel.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
-
-    public ArrayList<Node> getConnections() {
-        return connections;
+    public Node getNode(String ipAddress){
+        for (Node node : nodeList) {
+            if(node.getConnectionIp().toString().equals(ipAddress))
+                return node;
+        }
+        try {
+            System.out.println("gelen ip `"+ ipAddress+"`");
+            return new Node((Inet4Address) InetAddress.getByName(ipAddress));
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Gabriel.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    public ArrayList<Node> getNodes() {
+        return nodeList;
     }
 
-    public void setConnections(ArrayList<Node> connections) {
-        this.connections = connections;
+    public void setNodes(ArrayList<Node> nodeList) {
+        this.nodeList = nodeList;
     }
 
     public Introducer getMainIntroducer() {

@@ -13,7 +13,7 @@ import java.net.Socket;
  * @author EmreDan
  * This class is to manage existing connections between nodes
  */
-public class Node implements Runnable{
+public class Node {
 
     Socket connectionSocket;
     Inet4Address connectionIp;
@@ -24,13 +24,6 @@ public class Node implements Runnable{
 
     public Node(Inet4Address connectionIp) {
         this.connectionIp = connectionIp;
-    }
-
-    
-    
-    @Override
-    public void run() {
-        
     }
     
     public Socket getConnectionSocket() {

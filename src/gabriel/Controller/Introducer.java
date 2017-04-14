@@ -17,6 +17,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,21 +58,29 @@ public class Introducer implements Runnable {
     }
 
     public void checkHostsBruteForce(String subnet) {
-        hostCheckerAll = new HostCheckerAll(subnet, 255);
-        hostCheckerAll.start();
-        System.out.println(hostCheckerAll.getHostIps());
+        try {
+            ExecutorService executorService = Executors.newFixedThreadPool(1);
+            
+            hostCheckerAll = new HostCheckerAll(subnet, 255);
+            executorService.submit(hostCheckerAll::run);
+            executorService.shutdown();
+            
+            hostCheckerAll.getHostIps().forEach((hostIp) -> {
+                try {
+                    Inet4Address ipAddress = (Inet4Address) Inet4Address.getByName(hostIp);
+                    this.connections.add(new Node(ipAddress));
+                } catch (UnknownHostException ex) {
+                    System.out.println("Error on Introducer.getConnections()!");
+                }
+            });
+
+            System.out.println(hostCheckerAll.getHostIps());
+        } catch (Exception ex) {
+            Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     public ArrayList<Node> getConnections() {
-        connections=new ArrayList<>();
-        hostCheckerAll.getHostIps().forEach((hostIp) -> {
-            try {
-                Inet4Address ipAddress = (Inet4Address) Inet4Address.getByName(hostIp);
-                this.connections.add(new Node(ipAddress));
-            } catch (UnknownHostException ex) {
-                System.out.println("Error on Introducer.getConnections()!");
-            }
-        });
         return connections;
     }
 

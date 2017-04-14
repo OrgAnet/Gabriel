@@ -29,37 +29,28 @@ public class HostCheckerAll extends Thread {
 
     @Override
     public void run() {
-
         HostChecker[] hostCheckers = new HostChecker[possibleHostCount];
 
         String[] addresses = new String[possibleHostCount];
         for (int i = 0; i < possibleHostCount; i++) {
             addresses[i] = subnet + "." + i;
         }
-
-       // while (true) {
-            hostIps.clear();
-            ExecutorService executor = Executors.newFixedThreadPool(possibleHostCount);
-            for (int i = 0; i < possibleHostCount; i++) {
-                hostCheckers[i] = new HostChecker(addresses[i]);
-                executor.execute(hostCheckers[i]);
+        hostIps.clear();
+        ExecutorService executor = Executors.newFixedThreadPool(possibleHostCount);
+        for (int i = 0; i < possibleHostCount; i++) {
+            hostCheckers[i] = new HostChecker(addresses[i]);
+            executor.execute(hostCheckers[i]);
+        }
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+        }
+        for (int i = 0; i < possibleHostCount; i++) {
+            if (hostCheckers[i].isValid && !hostIps.contains(hostCheckers[i].hostName)) {
+                hostIps.add(hostCheckers[i].hostName);
+                System.out.println("Host Ip: " + hostCheckers[i].hostName + " added");
+                
             }
-            executor.shutdown();
-            while (!executor.isTerminated()) {
-            }
-            for (int i = 0; i < possibleHostCount; i++) {
-                if (hostCheckers[i].isValid && !hostIps.contains(hostCheckers[i].hostName)) {
-                    hostIps.add(hostCheckers[i].hostName);
-                    System.out.println("Host Ip: " + hostCheckers[i].hostName + " added");
-                }
-            }
-//            try {
-//                Thread.sleep(2000);
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(HostCheckerAll.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-      //  }
-
+        }
     }
 
     public ArrayList<String> getHostIps() {
