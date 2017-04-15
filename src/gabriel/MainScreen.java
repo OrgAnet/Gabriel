@@ -12,6 +12,7 @@ import static gabriel.Gabriel.RANDOM_PORT;
 import gabriel.models.Node;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -122,9 +123,18 @@ public class MainScreen extends javax.swing.JFrame {
         if (selectedIp == null) {
             JOptionPane.showMessageDialog(null, "Please choose 1 IP to connect to.");
         } else {
-            String ip = selectedIp.split(" -")[0].replaceAll("/", "");
-            Node selectedNode = gabriel.getNode(ip);
-            JOptionPane.showMessageDialog(null, "connecting:" + selectedNode.getConnectionIp().toString());
+            try {
+                String ip = selectedIp.split(" -")[0].replaceAll("/", "");
+                Node selectedNode = gabriel.getNode(ip);
+                JOptionPane.showMessageDialog(null, "connecting:" + selectedNode.getConnectionIp().toString());
+                
+                Socket aConnection = new Socket(selectedNode.getConnectionIp(), ABORT);
+                
+                
+            } catch (IOException ex) {
+                Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
         }
 
 

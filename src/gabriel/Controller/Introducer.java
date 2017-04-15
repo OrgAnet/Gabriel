@@ -5,6 +5,7 @@
  */
 package gabriel.Controller;
 
+import gabriel.models.Connection;
 import gabriel.models.Node;
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -29,9 +30,11 @@ import java.util.logging.Logger;
  */
 public class Introducer implements Runnable {
 
-    ArrayList<Node> nodes;
+    ArrayList<Node> nodes= new ArrayList<>();
     ServerSocket serverSocket;
-
+    
+    ArrayList<Connection> connections= new ArrayList<>();
+    
     HostCheckerAll hostCheckerAll;
 
     public Introducer(ArrayList<Node> connections, ServerSocket serverSocket) {

@@ -6,26 +6,26 @@
 package gabriel.models;
 
 import java.net.Inet4Address;
-import java.net.Socket;
 
 /**
- *
- * @author EmreDan
- * This class is to manage existing connections between nodes
+ * @author EmreDanisan
  */
-public class Node {
-
+public class Connection {
+    
     Inet4Address connectionIp;
 
-    public Node(Inet4Address connectionIp) {
+    public Connection(Inet4Address connectionIp) {
         this.connectionIp = connectionIp;
     }
-   
+
     public Inet4Address getConnectionIp() {
         return connectionIp;
     }
 
     public void setConnectionIp(Inet4Address connectionIp) {
         this.connectionIp = connectionIp;
-    }    
+    }
+    
+    
+    
 }
