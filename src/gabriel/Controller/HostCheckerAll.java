@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  *
  * @author TheDoctor
  */
-public class HostCheckerAll extends Thread {
+public class HostCheckerAll{
 
     ArrayList<String> hostIps = new ArrayList<>();
     String subnet;
@@ -27,8 +27,8 @@ public class HostCheckerAll extends Thread {
         this.possibleHostCount = possibleHostCount;
     }
 
-    @Override
     public void run() {
+        
         HostChecker[] hostCheckers = new HostChecker[possibleHostCount];
 
         String[] addresses = new String[possibleHostCount];

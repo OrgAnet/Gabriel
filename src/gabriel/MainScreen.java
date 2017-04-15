@@ -33,7 +33,6 @@ public class MainScreen extends javax.swing.JFrame {
     public MainScreen() {
         initComponents();
         gabriel = new Gabriel();
-        mainIntroducer = gabriel.getMainIntroducer();
     }
 
     /**
@@ -100,12 +99,13 @@ public class MainScreen extends javax.swing.JFrame {
             public void run() {
                 try {
                     //FIXME: Up Iplerin gelmesi uzun suruyor. Ve sonradan gelenler oluyor ??!
+                    mainIntroducer = gabriel.getMainIntroducer();
                     mainIntroducer.setConnections(new ArrayList<>());
                     mainIntroducer.checkHostsBruteForce(gabriel.getSubnet());
-                    Thread.sleep(2000);
+                    Thread.sleep(1);
                     IpList.removeAll();
                     for (Node node : mainIntroducer.getConnections()) {
-                        String nodeIp =node.getConnectionIp().toString()+"-"+ node.getConnectionIp().getHostName();
+                        String nodeIp = node.getConnectionIp().toString() + " - " + node.getConnectionIp().getHostName();
                         System.out.println("text to write:" + nodeIp);
                         IpList.add(nodeIp);
                     }
@@ -118,23 +118,16 @@ public class MainScreen extends javax.swing.JFrame {
     }//GEN-LAST:event_ScanNetworkButtonActionPerformed
 
     private void ConnectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectButtonActionPerformed
-        String selectedIp=IpList.getSelectedItem();
-        if(selectedIp ==null)
+        String selectedIp = IpList.getSelectedItem();
+        if (selectedIp == null) {
             JOptionPane.showMessageDialog(null, "Please choose 1 IP to connect to.");
-        else{
-            String ip = selectedIp.split("-")[0].replaceAll("/", "");
-            Node a= gabriel.getNode(ip);
-            JOptionPane.showMessageDialog(null, a.getConnectionIp().toString());
+        } else {
+            String ip = selectedIp.split(" -")[0].replaceAll("/", "");
+            Node selectedNode = gabriel.getNode(ip);
+            JOptionPane.showMessageDialog(null, "connecting:" + selectedNode.getConnectionIp().toString());
         }
-            
-        
-        
-        
-        
-        
-        
-        
-        
+
+
     }//GEN-LAST:event_ConnectButtonActionPerformed
 
     /**

@@ -29,13 +29,13 @@ import java.util.logging.Logger;
  */
 public class Introducer implements Runnable {
 
-    ArrayList<Node> connections;
+    ArrayList<Node> nodes;
     ServerSocket serverSocket;
 
     HostCheckerAll hostCheckerAll;
 
     public Introducer(ArrayList<Node> connections, ServerSocket serverSocket) {
-        this.connections = connections;
+        this.nodes = connections;
         this.serverSocket = serverSocket;
     }
 
@@ -59,16 +59,13 @@ public class Introducer implements Runnable {
 
     public void checkHostsBruteForce(String subnet) {
         try {
-            ExecutorService executorService = Executors.newFixedThreadPool(1);
-            
             hostCheckerAll = new HostCheckerAll(subnet, 255);
-            executorService.submit(hostCheckerAll::run);
-            executorService.shutdown();
+            hostCheckerAll.run();
             
             hostCheckerAll.getHostIps().forEach((hostIp) -> {
                 try {
                     Inet4Address ipAddress = (Inet4Address) Inet4Address.getByName(hostIp);
-                    this.connections.add(new Node(ipAddress));
+                    this.nodes.add(new Node(ipAddress));
                 } catch (UnknownHostException ex) {
                     System.out.println("Error on Introducer.getConnections()!");
                 }
@@ -81,11 +78,11 @@ public class Introducer implements Runnable {
     }
 
     public ArrayList<Node> getConnections() {
-        return connections;
+        return nodes;
     }
 
     public void setConnections(ArrayList<Node> connections) {
-        this.connections = connections;
+        this.nodes = connections;
     }
 
 }
