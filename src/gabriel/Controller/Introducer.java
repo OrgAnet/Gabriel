@@ -9,17 +9,10 @@ import gabriel.models.Connection;
 import gabriel.models.Node;
 import java.io.IOException;
 import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,41 +23,28 @@ import java.util.logging.Logger;
  */
 public class Introducer implements Runnable {
 
-    ArrayList<Node> nodes= new ArrayList<>();
-    ServerSocket serverSocket;
-    
-    ArrayList<Connection> connections= new ArrayList<>();
-    
+    ArrayList<Node> nodes = new ArrayList<>();
     HostCheckerAll hostCheckerAll;
 
-    public Introducer(ArrayList<Node> connections, ServerSocket serverSocket) {
+    public Introducer(ArrayList<Node> connections) {
         this.nodes = connections;
-        this.serverSocket = serverSocket;
     }
 
     @Override
     public void run() {
         // When new connection comes add it to connections
-        while (true) {
-            try {
-                // Actively listen for new connections to serverSocket.
-                Socket connectionSocket = serverSocket.accept();
-
-                //TODO: Search for why we should use logger.
-                System.out.println("Node " + connectionSocket.getInetAddress()
-                        + ":" + connectionSocket.getPort() + " is connected.");
-
-            } catch (IOException ex) {
-                Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+//        while (true) {
+//            //TODO: Search for why we should use logger.
+//            System.out.println("Node " + connectionSocket.getInetAddress()
+//                    + ":" + connectionSocket.getPort() + " is connected.");
+//        }
     }
 
     public void checkHostsBruteForce(String subnet) {
         try {
             hostCheckerAll = new HostCheckerAll(subnet, 255);
             hostCheckerAll.run();
-            
+
             hostCheckerAll.getHostIps().forEach((hostIp) -> {
                 try {
                     Inet4Address ipAddress = (Inet4Address) Inet4Address.getByName(hostIp);
@@ -80,12 +60,20 @@ public class Introducer implements Runnable {
         }
     }
 
-    public ArrayList<Node> getConnections() {
+    public ArrayList<Node> getNodes() {
         return nodes;
     }
 
-    public void setConnections(ArrayList<Node> connections) {
-        this.nodes = connections;
+    public void setNodes(ArrayList<Node> nodes) {
+        this.nodes = nodes;
+    }
+
+    public HostCheckerAll getHostCheckerAll() {
+        return hostCheckerAll;
+    }
+
+    public void setHostCheckerAll(HostCheckerAll hostCheckerAll) {
+        this.hostCheckerAll = hostCheckerAll;
     }
 
 }

@@ -6,13 +6,11 @@
 package gabriel;
 
 import gabriel.Controller.Introducer;
-import gabriel.Controller.Receiver;
-import gabriel.Controller.Sender;
-import static gabriel.Gabriel.RANDOM_PORT;
+import gabriel.models.Connection;
 import gabriel.models.Node;
+import java.awt.HeadlessException;
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -30,10 +28,12 @@ public class MainScreen extends javax.swing.JFrame {
      */
     Gabriel gabriel;
     Introducer mainIntroducer;
+    ConnectionManager connectionManager;
 
     public MainScreen() {
         initComponents();
         gabriel = new Gabriel();
+        connectionManager = gabriel.getConnectionManager();
     }
 
     /**
@@ -48,6 +48,10 @@ public class MainScreen extends javax.swing.JFrame {
         ScanNetworkButton = new javax.swing.JButton();
         IpList = new java.awt.List();
         ConnectButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        ConnectionList = new java.awt.List();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -58,6 +62,8 @@ public class MainScreen extends javax.swing.JFrame {
             }
         });
 
+        IpList.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
+
         ConnectButton.setText("Connect");
         ConnectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -65,30 +71,63 @@ public class MainScreen extends javax.swing.JFrame {
             }
         });
 
+        jLabel1.setFont(new java.awt.Font("Sitka Text", 1, 14)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Nodes in your AdHoc Network");
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel2.setText("Welcome to Organic AdHoc Networks!");
+
+        jLabel3.setFont(new java.awt.Font("Sitka Text", 1, 14)); // NOI18N
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Active Connections");
+        jLabel3.setToolTipText("");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(ScanNetworkButton)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(IpList, javax.swing.GroupLayout.PREFERRED_SIZE, 299, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(28, 28, 28)
-                        .addComponent(ConnectButton)))
-                .addContainerGap(172, Short.MAX_VALUE))
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(IpList, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(50, 50, 50)
+                                .addComponent(ConnectionList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(ScanNetworkButton)
+                                .addGap(18, 18, 18)
+                                .addComponent(ConnectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(50, 50, 50)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(189, 189, 189)
+                        .addComponent(jLabel2)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(ScanNetworkButton)
-                .addGap(36, 36, 36)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(IpList, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ConnectButton))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addComponent(jLabel2)
+                .addGap(31, 31, 31)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(ConnectionList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(IpList, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(ConnectButton)
+                    .addComponent(ScanNetworkButton))
+                .addContainerGap(48, Short.MAX_VALUE))
         );
 
         pack();
@@ -101,11 +140,11 @@ public class MainScreen extends javax.swing.JFrame {
                 try {
                     //FIXME: Up Iplerin gelmesi uzun suruyor. Ve sonradan gelenler oluyor ??!
                     mainIntroducer = gabriel.getMainIntroducer();
-                    mainIntroducer.setConnections(new ArrayList<>());
+                    mainIntroducer.setNodes(new ArrayList<>());
                     mainIntroducer.checkHostsBruteForce(gabriel.getSubnet());
                     Thread.sleep(1);
                     IpList.removeAll();
-                    for (Node node : mainIntroducer.getConnections()) {
+                    for (Node node : mainIntroducer.getNodes()) {
                         String nodeIp = node.getConnectionIp().toString() + " - " + node.getConnectionIp().getHostName();
                         System.out.println("text to write:" + nodeIp);
                         IpList.add(nodeIp);
@@ -127,17 +166,17 @@ public class MainScreen extends javax.swing.JFrame {
                 String ip = selectedIp.split(" -")[0].replaceAll("/", "");
                 Node selectedNode = gabriel.getNode(ip);
                 JOptionPane.showMessageDialog(null, "connecting:" + selectedNode.getConnectionIp().toString());
-                
-                Socket aConnection = new Socket(selectedNode.getConnectionIp(), ABORT);
-                
-                
-            } catch (IOException ex) {
+                Connection newConnection = new Connection((Inet4Address) selectedNode.getConnectionIp());
+
+                connectionManager.addConnection(newConnection);
+                connectionManager.startConnection(newConnection);
+
+                ConnectionList.add(newConnection.getConnectionIp().toString());
+
+            } catch (HeadlessException ex) {
                 Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
         }
-
-
     }//GEN-LAST:event_ConnectButtonActionPerformed
 
     /**
@@ -179,7 +218,11 @@ public class MainScreen extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ConnectButton;
+    private java.awt.List ConnectionList;
     private java.awt.List IpList;
     private javax.swing.JButton ScanNetworkButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     // End of variables declaration//GEN-END:variables
 }

@@ -11,7 +11,7 @@ import java.net.Inet4Address;
  * @author EmreDanisan
  */
 public class Connection {
-    
+
     Inet4Address connectionIp;
 
     public Connection(Inet4Address connectionIp) {
@@ -25,7 +25,10 @@ public class Connection {
     public void setConnectionIp(Inet4Address connectionIp) {
         this.connectionIp = connectionIp;
     }
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return "Connection{" + "connectionIp=" + connectionIp + '}';
+    }
+
 }
