@@ -8,14 +8,16 @@ package gabriel;
 import gabriel.Controller.Introducer;
 import gabriel.models.Connection;
 import gabriel.models.Node;
+import java.awt.BorderLayout;
 import java.awt.HeadlessException;
-import java.io.IOException;
 import java.net.Inet4Address;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 /**
  *
@@ -34,6 +36,13 @@ public class MainScreen extends javax.swing.JFrame {
         initComponents();
         gabriel = new Gabriel();
         connectionManager = gabriel.getConnectionManager();
+        mainIntroducer = gabriel.getMainIntroducer();
+        mainIntroducer.checkHostsBruteForce(gabriel.getSubnet());
+        mainIntroducer.getHostCheckerAll().getHostIps().forEach((node) -> {
+            IpList.add(node);
+        });
+        
+
     }
 
     /**
@@ -46,12 +55,15 @@ public class MainScreen extends javax.swing.JFrame {
     private void initComponents() {
 
         ScanNetworkButton = new javax.swing.JButton();
-        IpList = new java.awt.List();
         ConnectButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         ConnectionList = new java.awt.List();
         jLabel3 = new javax.swing.JLabel();
+        IpList = new java.awt.List();
+        jLabel4 = new javax.swing.JLabel();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
+        jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -61,8 +73,6 @@ public class MainScreen extends javax.swing.JFrame {
                 ScanNetworkButtonActionPerformed(evt);
             }
         });
-
-        IpList.setFont(new java.awt.Font("Dialog", 0, 11)); // NOI18N
 
         ConnectButton.setText("Connect");
         ConnectButton.addActionListener(new java.awt.event.ActionListener() {
@@ -83,6 +93,14 @@ public class MainScreen extends javax.swing.JFrame {
         jLabel3.setText("Active Connections");
         jLabel3.setToolTipText("");
 
+        IpList.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                IpListActionPerformed(evt);
+            }
+        });
+
+        jLabel4.setText("Your File Index Table");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -93,22 +111,33 @@ public class MainScreen extends javax.swing.JFrame {
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(IpList, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(50, 50, 50)
-                                .addComponent(ConnectionList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(ScanNetworkButton)
-                                .addGap(18, 18, 18)
-                                .addComponent(ConnectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 279, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(50, 50, 50)
-                                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(10, 10, 10)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(ConnectButton, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(IpList, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(ScanNetworkButton)
+                                            .addComponent(jLabel4)
+                                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+                            .addComponent(ConnectionList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(189, 189, 189)
                         .addComponent(jLabel2)))
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(81, 81, 81))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -121,13 +150,19 @@ public class MainScreen extends javax.swing.JFrame {
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(ConnectionList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(IpList, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE))
+                    .addComponent(ConnectionList, javax.swing.GroupLayout.DEFAULT_SIZE, 199, Short.MAX_VALUE)
+                    .addComponent(IpList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ConnectButton)
-                    .addComponent(ScanNetworkButton))
-                .addContainerGap(48, Short.MAX_VALUE))
+                    .addComponent(ScanNetworkButton)
+                    .addComponent(ConnectButton))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(29, 29, 29))
         );
 
         pack();
@@ -138,17 +173,15 @@ public class MainScreen extends javax.swing.JFrame {
             @Override
             public void run() {
                 try {
+                    IpList.removeAll();
                     //FIXME: Up Iplerin gelmesi uzun suruyor. Ve sonradan gelenler oluyor ??!
                     mainIntroducer = gabriel.getMainIntroducer();
                     mainIntroducer.setNodes(new ArrayList<>());
                     mainIntroducer.checkHostsBruteForce(gabriel.getSubnet());
                     Thread.sleep(1);
-                    IpList.removeAll();
-                    for (Node node : mainIntroducer.getNodes()) {
-                        String nodeIp = node.getConnectionIp().toString() + " - " + node.getConnectionIp().getHostName();
-                        System.out.println("text to write:" + nodeIp);
-                        IpList.add(nodeIp);
-                    }
+                    mainIntroducer.getHostCheckerAll().getHostIps().forEach((node) -> {
+                        IpList.add(node);
+                    });
                 } catch (InterruptedException ex) {
                     Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -165,7 +198,6 @@ public class MainScreen extends javax.swing.JFrame {
             try {
                 String ip = selectedIp.split(" -")[0].replaceAll("/", "");
                 Node selectedNode = gabriel.getNode(ip);
-                JOptionPane.showMessageDialog(null, "connecting:" + selectedNode.getConnectionIp().toString());
                 Connection newConnection = new Connection((Inet4Address) selectedNode.getConnectionIp());
 
                 connectionManager.addConnection(newConnection);
@@ -178,6 +210,10 @@ public class MainScreen extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_ConnectButtonActionPerformed
+
+    private void IpListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IpListActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_IpListActionPerformed
 
     /**
      * @param args the command line arguments
@@ -221,8 +257,11 @@ public class MainScreen extends javax.swing.JFrame {
     private java.awt.List ConnectionList;
     private java.awt.List IpList;
     private javax.swing.JButton ScanNetworkButton;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JSeparator jSeparator1;
     // End of variables declaration//GEN-END:variables
 }

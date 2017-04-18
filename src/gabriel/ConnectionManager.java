@@ -6,7 +6,11 @@
 package gabriel;
 
 import gabriel.models.Connection;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -15,7 +19,7 @@ import java.util.ArrayList;
 public class ConnectionManager {
 
     private ArrayList<Connection> connections = new ArrayList<>();
-
+    private final Integer PORT_NO=5000;
     public ConnectionManager() {
 
     }
@@ -25,7 +29,11 @@ public class ConnectionManager {
     }
 
     void startConnection(Connection newConnection) {
-
+        try {
+            newConnection.setConnectionSocket(new Socket(newConnection.getConnectionIp(), PORT_NO));
+        } catch (IOException ex) {
+            Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

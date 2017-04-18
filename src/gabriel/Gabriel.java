@@ -56,6 +56,7 @@ public class Gabriel {
         sender = new Sender();
         receiver = new Receiver();
         mainIntroducer = new Introducer(nodeList);
+        connectionManager = new ConnectionManager();
     }
 
     public Node getNode(String ipAddress) {
