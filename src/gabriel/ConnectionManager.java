@@ -8,7 +8,9 @@ package gabriel;
 import gabriel.models.Connection;
 import gabriel.models.Index;
 import gabriel.models.SharedFileHeader;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -25,6 +27,9 @@ public class ConnectionManager {
     private ArrayList<Connection> connections = new ArrayList<>();
     private final Integer PORT_NO = 5000;
 
+    Index myIndex = new Index();
+    Index networkIndex = new Index();
+
     public Integer getPORT_NO() {
         return PORT_NO;
     }
@@ -40,12 +45,7 @@ public class ConnectionManager {
     Boolean startConnection(Connection newConnection) {
         try {
             newConnection.setConnectionSocket(new Socket(newConnection.getConnectionIp(), PORT_NO));
-            Index myIndex = new Index();
-            //falsely filled
-            SharedFileHeader fakeSharedFile = new SharedFileHeader();
-            fakeSharedFile.setName("ilk file header");
 
-            myIndex.getFileHeaders().add(fakeSharedFile);
             sendData(newConnection, myIndex);
             addConnection(newConnection);
             return true;
@@ -65,6 +65,39 @@ public class ConnectionManager {
             Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    public Index getMyIndex() {
+        return myIndex;
+    }
+
+    public void setMyIndex(Index myIndex) {
+        this.myIndex = myIndex;
+    }
+
+    public Index getNetworkIndex() {
+        return networkIndex;
+    }
+
+    public void setNetworkIndex(Index networkIndex) {
+        this.networkIndex = networkIndex;
+    }
+
+    void addToNetworkIndex(Index incomingIndex) {
+        this.networkIndex.getFileHeaders().addAll(incomingIndex.getFileHeaders());
+    }
+
+    Index getIndex(Socket connectionSocket) {
+        Index incomingIndex = null;
+        try {
+            //Getting the ObjectInputStream to retrive file index
+            ObjectInputStream incomingStream = new ObjectInputStream(new BufferedInputStream(connectionSocket.getInputStream()));
+       
+            incomingIndex = (Index) incomingStream.readObject();
+        } catch (IOException | ClassNotFoundException ex) {
+            Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return incomingIndex;
     }
 
 }
