@@ -9,7 +9,7 @@ import java.net.Inet4Address;
 import java.net.Socket;
 
 /**
- * @author EmreDanisan
+ * @author TheDoctor
  */
 public class Connection {
 

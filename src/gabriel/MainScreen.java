@@ -7,18 +7,20 @@ package gabriel;
 
 import gabriel.Controller.Introducer;
 import gabriel.models.Connection;
+import gabriel.models.Index;
 import gabriel.models.Node;
-import java.awt.BorderLayout;
 import java.awt.HeadlessException;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.Inet4Address;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-
 /**
  *
  * @author TheDoctor
@@ -41,7 +43,6 @@ public class MainScreen extends javax.swing.JFrame {
         mainIntroducer.getHostCheckerAll().getHostIps().forEach((node) -> {
             IpList.add(node);
         });
-        
 
     }
 
@@ -63,7 +64,7 @@ public class MainScreen extends javax.swing.JFrame {
         IpList = new java.awt.List();
         jLabel4 = new javax.swing.JLabel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
-        jSeparator1 = new javax.swing.JSeparator();
+        listenConnection = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -101,6 +102,13 @@ public class MainScreen extends javax.swing.JFrame {
 
         jLabel4.setText("Your File Index Table");
 
+        listenConnection.setText("Listen for connection");
+        listenConnection.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                listenConnectionActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -124,12 +132,14 @@ public class MainScreen extends javax.swing.JFrame {
                                     .addGroup(layout.createSequentialGroup()
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(ScanNetworkButton)
-                                            .addComponent(jLabel4)
-                                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 257, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(jLabel4))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
-                            .addComponent(ConnectionList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(ConnectionList, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(listenConnection))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(189, 189, 189)
                         .addComponent(jLabel2)))
@@ -158,11 +168,11 @@ public class MainScreen extends javax.swing.JFrame {
                     .addComponent(ConnectButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
                 .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(29, 29, 29))
+                .addGap(14, 14, 14)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(listenConnection))
+                .addGap(172, 172, 172))
         );
 
         pack();
@@ -201,9 +211,11 @@ public class MainScreen extends javax.swing.JFrame {
                 Connection newConnection = new Connection((Inet4Address) selectedNode.getConnectionIp());
 
                 connectionManager.addConnection(newConnection);
-                connectionManager.startConnection(newConnection);
-
-                ConnectionList.add(newConnection.getConnectionIp().toString());
+                if (connectionManager.startConnection(newConnection)) {
+                    ConnectionList.add(newConnection.getConnectionIp().toString());
+                } else {
+                    System.out.println("Sorry, could not connect to: " + newConnection.getConnectionIp().toString());
+                }
 
             } catch (HeadlessException ex) {
                 Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
@@ -214,6 +226,32 @@ public class MainScreen extends javax.swing.JFrame {
     private void IpListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IpListActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_IpListActionPerformed
+
+    private void listenConnectionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listenConnectionActionPerformed
+
+        try {
+            //Listening for a connection to be made
+            ServerSocket serverSocket = new ServerSocket(connectionManager.getPORT_NO());
+            System.out.println("TCPServer Waiting for client on port 5000\n");
+            Socket connectionSocket = serverSocket.accept();
+            
+            //Getting the ObjectInputStream to retrive file index
+            ObjectInputStream incomingStream = new ObjectInputStream(new BufferedInputStream(connectionSocket.getInputStream()));
+            Index incomingData; 
+            incomingData = (Index) incomingStream.readObject();
+            System.out.println(incomingData.getFileHeaders().get(0).getName());
+
+        } catch (IOException ex) {
+            System.out.println("Input Output Exception on Listen Connection Action Performed");
+            Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (ClassNotFoundException ex) {
+            System.out.println("Class Cast Exception on Listen Connection Action Performed");
+            Logger.getLogger(MainScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+    }//GEN-LAST:event_listenConnectionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -262,6 +300,6 @@ public class MainScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JButton listenConnection;
     // End of variables declaration//GEN-END:variables
 }

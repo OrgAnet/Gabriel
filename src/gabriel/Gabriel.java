@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author EmreDan This class is to: Listen for connection, send & receive
+ * @author TheDoctor This class is to: Listen for connection, send & receive
  * messages from & to nodes, update locale & remote index tables
  *
  */

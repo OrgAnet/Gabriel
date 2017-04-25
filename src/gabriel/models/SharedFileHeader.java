@@ -8,6 +8,7 @@ package gabriel.models;
 import gabriel.Controller.Hasher;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
@@ -18,14 +19,26 @@ import java.util.logging.Logger;
  *
  * @author TheDoctor
  */
-public class SharedFile {
+public class SharedFileHeader implements Serializable{
 
+    private String name = "";
     private String path = null;
     private String mimeType = null;
     private String hash = null;
     private Long size = null;
     private Long lastModified = null;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    
+    
+    
     public String getPath() {
         return path;
     }
@@ -71,9 +84,9 @@ public class SharedFile {
             hash = Hasher.calculateFileHash(this.getPath());
             return hash;
         } catch (IOException ex) {
-            Logger.getLogger(SharedFile.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SharedFileHeader.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(SharedFile.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(SharedFileHeader.class.getName()).log(Level.SEVERE, null, ex);
         }
         return hash;
     }
@@ -89,7 +102,7 @@ public class SharedFile {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final SharedFile other = (SharedFile) obj;
+        final SharedFileHeader other = (SharedFileHeader) obj;
         if (!Objects.equals(this.path, other.path)) {
             return false;
         }
