@@ -1,2 +1,4 @@
 # Gabriel
-Repository for organic node communication and resource transportation
+
+Organic node communication and resource transmission.
+
