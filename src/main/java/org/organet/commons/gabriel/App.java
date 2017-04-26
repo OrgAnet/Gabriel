@@ -20,15 +20,21 @@ public class App {
   private static Receiver receiver;
   private static Sender sender;
   private static ConnectionManager connectionManager;
+  private static MainForm mainForm;
 
-  String subnet = "192.168.1";
+  static String subnet = "192.168.1";
 
   public static void main(String args[]) {
     nodeList = new ArrayList<>();
     sender = new Sender();
     receiver = new Receiver();
     mainIntroducer = new Introducer(nodeList);
-    connectionManager = new ConnectionManager();
+//    connectionManager = new ConnectionManager();
+    mainForm = new MainForm();
+
+    // ...
+
+    mainForm.setVisible(true);
   }
 
   public ArrayList<Node> getNodeList() {
@@ -39,7 +45,7 @@ public class App {
     App.nodeList = nodeList;
   }
 
-  public ConnectionManager getConnectionManager() {
+  static ConnectionManager getConnectionManager() {
     return connectionManager;
   }
 
@@ -47,12 +53,13 @@ public class App {
     App.connectionManager = connectionManager;
   }
 
-  public Node getNode(String ipAddress) {
+  static Node getNode(String ipAddress) {
     for (Node node : nodeList) {
       if (node.getConnectionIp().toString().equals(ipAddress)) {
         return node;
       }
     }
+
     try {
       System.out.println("gelen ip `" + ipAddress + "`");
       return new Node((Inet4Address) InetAddress.getByName(ipAddress));
@@ -70,7 +77,7 @@ public class App {
     App.nodeList = nodeList;
   }
 
-  public Introducer getMainIntroducer() {
+  static Introducer getMainIntroducer() {
     return mainIntroducer;
   }
 
@@ -92,13 +99,5 @@ public class App {
 
   public void setSender(Sender sender) {
     App.sender = sender;
-  }
-
-  public String getSubnet() {
-    return subnet;
-  }
-
-  public void setSubnet(String subnet) {
-    this.subnet = subnet;
   }
 }
