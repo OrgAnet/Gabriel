@@ -5,8 +5,6 @@
  */
 package gabriel;
 
-import gabriel.Controller.Sender;
-import gabriel.Controller.Receiver;
 import gabriel.Controller.Introducer;
 import gabriel.models.Node;
 import java.io.IOException;
@@ -31,8 +29,6 @@ public class Gabriel {
 
     private ArrayList<Node> nodeList;
     private Introducer mainIntroducer;
-    private Receiver receiver;
-    private Sender sender;
     private ConnectionManager connectionManager;
 
     public ArrayList<Node> getNodeList() {
@@ -53,8 +49,6 @@ public class Gabriel {
 
     public Gabriel() {
         nodeList = new ArrayList<>();
-        sender = new Sender();
-        receiver = new Receiver();
         mainIntroducer = new Introducer(nodeList);
         connectionManager = new ConnectionManager();
     }
@@ -88,22 +82,6 @@ public class Gabriel {
 
     public void setMainIntroducer(Introducer mainIntroducer) {
         this.mainIntroducer = mainIntroducer;
-    }
-
-    public Receiver getReceiver() {
-        return receiver;
-    }
-
-    public void setReceiver(Receiver receiver) {
-        this.receiver = receiver;
-    }
-
-    public Sender getSender() {
-        return sender;
-    }
-
-    public void setSender(Sender sender) {
-        this.sender = sender;
     }
 
     public String getSubnet() {

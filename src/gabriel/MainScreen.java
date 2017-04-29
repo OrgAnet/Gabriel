@@ -13,6 +13,7 @@ import java.awt.HeadlessException;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.OutputStream;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -106,7 +107,7 @@ public class MainScreen extends javax.swing.JFrame {
 
         jLabel4.setText("Your File Index Table");
 
-        listenConnection.setText("Get Index");
+        listenConnection.setText("Listen Connection");
         listenConnection.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 listenConnectionActionPerformed(evt);
@@ -260,6 +261,9 @@ public class MainScreen extends javax.swing.JFrame {
 //          connectionManager.networkIndex.getFileHeaders().addAll(incomingData.getFileHeaders());
             System.out.println(nodeIndex.getFileHeaders().get(0).getName());
             
+            
+            //move connection manager
+            OutputStream os = connectionSocket.getOutputStream();
             
             ConnectionListBox.add(newIncomingConnection.getConnectionIp().toString());
 
