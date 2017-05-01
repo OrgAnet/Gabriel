@@ -2,7 +2,6 @@ package org.organet.commons.gabriel;
 
 import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.inofy.Index;
-import org.organet.commons.inofy.Inofy;
 
 import java.io.*;
 import java.net.Socket;
@@ -33,7 +32,7 @@ public class ConnectionManager {
     try {
       newConnection.setConnectionSocket(new Socket(newConnection.getConnectionIp(), PORT_NO));
 
-      sendData(newConnection, Inofy.localIndex);
+      sendData(newConnection, App.localIndex);
       addConnection(newConnection);
       return true;
     } catch (IOException ex) {

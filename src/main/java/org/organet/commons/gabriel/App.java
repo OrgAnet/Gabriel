@@ -2,27 +2,42 @@ package org.organet.commons.gabriel;
 
 import org.organet.commons.gabriel.Controller.Introducer;
 import org.organet.commons.gabriel.Model.Node;
-import org.organet.commons.inofy.Inofy;
+import org.organet.commons.inofy.Index;
+import org.organet.commons.inofy.Watcher;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 public class App {
   final static int RANDOM_PORT = 5000;
   final static String SUBNET = "192.168.1";
 
-  public static MainForm mainForm;
+  public static Index localIndex = null;
 
   private static ArrayList<Node> nodeList;
   private static Introducer introducer;
   private static ConnectionManager connectionManager; // TODO
   private static int possibleHostsCount;
 
+  public static MainForm mainForm;
+
   public static void main(String args[]) {
+    if (args.length < 1) {
+      System.out.println("Shared directory path is missing, first argument must be a valid path.");
+
+      return;
+    }
+
     calculatePossibleHostsCount();
 
     nodeList = new ArrayList<>();
@@ -32,7 +47,30 @@ public class App {
     mainForm = new MainForm();
     mainForm.setVisible(true);
 
-    Inofy.start(args[0]);
+    String sharedDirPath = args[0];
+    File sharedDir = new File(sharedDirPath);
+    localIndex = new Index();
+
+    // Walk shared directory for initial indexing
+    try(Stream<Path> paths = Files.walk(Paths.get(sharedDirPath))) {
+      paths.forEach(filePath -> {
+        if (Files.isRegularFile(filePath)) {
+          // FIXME Implement this behaviour in another way (i.e. anywhere else)
+          App.mainForm.LocalIndexListModel.addElement(filePath.toFile().getName());
+        }
+      });
+    } catch (IOException e) {
+      e.printStackTrace();
+
+      return;
+    }
+
+    // Watch the shared directory directory recursively for changes
+    try {
+      (new Watcher(sharedDir.getPath())).run();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   private static void calculatePossibleHostsCount() {

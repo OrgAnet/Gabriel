@@ -24,26 +24,15 @@ public class Watcher implements Runnable {
   /**
    * Creates a WatchService and registers the given directory
    */
-  Watcher(Path dir, boolean recursive) throws IOException {
+  Watcher(Path dir) throws IOException {
     watcher = FileSystems.getDefault().newWatchService();
     keys = new HashMap<>();
 
-    if (recursive) {
-      System.out.println(String.format(
-          "[ INFO ] Watcher | Scanning %s...",
-          dir
-      ));
-
-      registerAll(dir);
-
-      System.out.println("[ INFO ] Watcher | Scan is done.");
-    } else {
-      register(dir);
-    }
+    registerAll(dir);
   }
 
-  Watcher(String path) throws IOException {
-    this(Paths.get(path), true);
+  public Watcher(String path) throws IOException {
+    this(Paths.get(path));
   }
 
   /**
@@ -140,7 +129,7 @@ public class Watcher implements Runnable {
 
           if (kind == ENTRY_CREATE) {
             // Create a shared file and add to the local index
-            Inofy.localIndex.add(new SharedFile(child.toString()));
+            App.localIndex.add(new SharedFile(child.toString()));
 
             // FIXME Implement this behaviour in another way (i.e. anywhere else) \
             // filename MUST stay as it is, it is not the problem here
@@ -149,7 +138,7 @@ public class Watcher implements Runnable {
             // TODO Re-calculate the hash and update the local index
           } else if (kind == ENTRY_DELETE) {
             // Remove file from the local index
-            Inofy.localIndex.remove(child);
+            App.localIndex.remove(child);
 
             // FIXME Implement this behaviour in another way (i.e. anywhere else) \
             // filename MUST stay as it is, it is not the problem here
