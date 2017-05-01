@@ -1,5 +1,6 @@
 package org.organet.commons.gabriel.Controller;
 
+import org.organet.commons.gabriel.App;
 import org.organet.commons.gabriel.Model.Node;
 
 import java.net.Inet4Address;
@@ -13,8 +14,8 @@ import java.util.logging.Logger;
  * creates a Connection object and listens for new connection.
  */
 public class Introducer implements Runnable {
-  ArrayList<Node> nodes = new ArrayList<>();
-  HostCheckerAll hostCheckerAll;
+  private ArrayList<Node> nodes = new ArrayList<>();
+  private HostCheckerAll hostCheckerAll;
 
   public Introducer(ArrayList<Node> connections) {
     this.nodes = connections;
@@ -23,17 +24,17 @@ public class Introducer implements Runnable {
   @Override
   public void run() {
     throw new UnsupportedOperationException("Not supported yet."); // FIXME
-    // When new connection comes add it to connections
-//        while (true) {
-//            //TODO: Search for why we should use logger.
-//            System.out.println("Node " + connectionSocket.getInetAddress()
-//                    + ":" + connectionSocket.getPort() + " is connected.");
-//        }
+
+//    // When new connection comes add it to connections
+//    while (true) {
+//      //TODO: Search for why we should use logger.
+//      System.out.println("Node " + connectionSocket.getInetAddress() + ":" + connectionSocket.getPort() + " is connected.");
+//    }
   }
 
   public void checkHostsBruteForce(String subnet) {
     try {
-      hostCheckerAll = new HostCheckerAll(subnet, 255);
+      hostCheckerAll = new HostCheckerAll(subnet, App.getPossibleHostsCount());
       hostCheckerAll.run();
 
       hostCheckerAll.getHostIps().forEach((hostIp) -> {

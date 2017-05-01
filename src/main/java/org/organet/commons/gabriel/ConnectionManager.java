@@ -1,7 +1,8 @@
 package org.organet.commons.gabriel;
 
 import org.organet.commons.gabriel.Model.Connection;
-import org.organet.commons.gabriel.Model.Index;
+import org.organet.commons.inofy.Index;
+import org.organet.commons.inofy.Inofy;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,7 +14,6 @@ public class ConnectionManager {
   private ArrayList<Connection> connections = new ArrayList<>();
   private final Integer PORT_NO = 5000;
 
-  Index myIndex = new Index();
   Index networkIndex = new Index();
 
   public Integer getPORT_NO() {
@@ -33,7 +33,7 @@ public class ConnectionManager {
     try {
       newConnection.setConnectionSocket(new Socket(newConnection.getConnectionIp(), PORT_NO));
 
-      sendData(newConnection, myIndex);
+      sendData(newConnection, Inofy.localIndex);
       addConnection(newConnection);
       return true;
     } catch (IOException ex) {
@@ -54,14 +54,6 @@ public class ConnectionManager {
 
   }
 
-  public Index getMyIndex() {
-    return myIndex;
-  }
-
-  public void setMyIndex(Index myIndex) {
-    this.myIndex = myIndex;
-  }
-
   public Index getNetworkIndex() {
     return networkIndex;
   }
@@ -70,9 +62,9 @@ public class ConnectionManager {
     this.networkIndex = networkIndex;
   }
 
-  void addToNetworkIndex(Index incomingIndex) {
-    this.networkIndex.getFileHeaders().addAll(incomingIndex.getFileHeaders());
-  }
+//  void addToNetworkIndex(Index incomingIndex) { // FIXME
+//    this.networkIndex.getFileHeaders().addAll(incomingIndex.getFileHeaders());
+//  }
 
   Index getIndex(Socket connectionSocket) {
     Index incomingIndex = null;

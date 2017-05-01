@@ -2,96 +2,93 @@ package org.organet.commons.gabriel;
 
 import org.organet.commons.gabriel.Controller.Introducer;
 import org.organet.commons.gabriel.Model.Connection;
-import org.organet.commons.gabriel.Model.Index;
 import org.organet.commons.gabriel.Model.Node;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@SuppressWarnings("unused")
 public class MainForm extends JFrame {
-  private JList IpListBox;
+  private JList<String> IpListBox;
   private JButton ScanNetworkButton;
   private JButton ConnectButton;
-  private JList ConnectionListBox;
+  private JList<String> ConnectionListBox;
   private JButton listenConnection;
-  private JList LocalIndexListBox;
-  private JList NetworkIndexListBox;
+  private JList<String> LocalIndexListBox;
+  private JList<String> NetworkIndexListBox;
+  private JPanel panelMain;
+
+  private DefaultListModel<String> IpListModel = new DefaultListModel<>();
+  private DefaultListModel<String> ConnectionListModel = new DefaultListModel<>();
+  public DefaultListModel<String> LocalIndexListModel = new DefaultListModel<>();
+//  private DefaultListModel<String> NetworkIndexListModel = new DefaultListModel<>();
 
   // TODO Move these to App
-  private Introducer mainIntroducer;
+  private Introducer introducer;
   private ConnectionManager connectionManager;
 
   MainForm() {
-    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    IpListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    IpListBox.setLayoutOrientation(JList.VERTICAL);
+    IpListBox.setModel(IpListModel);
 
-    IpListBox.addListSelectionListener(this::IpListBoxActionPerformed);
+    ConnectionListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    ConnectionListBox.setLayoutOrientation(JList.VERTICAL);
+    ConnectionListBox.setModel(ConnectionListModel);
+
+    LocalIndexListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    LocalIndexListBox.setLayoutOrientation(JList.VERTICAL);
+    LocalIndexListBox.setModel(LocalIndexListModel);
+
+    NetworkIndexListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    NetworkIndexListBox.setLayoutOrientation(JList.VERTICAL);
+//    NetworkIndexListBox.setModel(NetworkIndexListModel);
+
     ScanNetworkButton.addActionListener(this::ScanNetworkButtonActionPerformed);
     ConnectButton.addActionListener(this::ConnectButtonActionPerformed);
     listenConnection.addActionListener(this::listenConnectionActionPerformed);
 
     connectionManager = App.getConnectionManager();
-    mainIntroducer = App.getMainIntroducer();
-    mainIntroducer.checkHostsBruteForce(App.subnet);
-//    mainIntroducer.getHostCheckerAll().getHostIps().forEach((node) -> { FIXME
-//      ListModel IpListBoxModel = IpListBox.getModel();
-//      ((DefaultListModel<String>)IpListBoxModel).addElement(node);
-//      IpListBox.setModel(IpListBoxModel);
-////      IpListBox.add(node);
-//    });
-  }
+    introducer = App.getIntroducer();
+    introducer.checkHostsBruteForce(App.SUBNET);
+    getAndListHosts();
 
-  private void IpListBoxActionPerformed(ListSelectionEvent evt) {
-    throw new UnsupportedOperationException("Not supported yet."); // FIXME
+    setContentPane(panelMain);
+    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    pack();
   }
 
   private void ScanNetworkButtonActionPerformed(ActionEvent evt) {
-    Executors.newSingleThreadExecutor().execute(() -> {
-      try {
-        IpListBox.removeAll();
-        //FIXME: Up Iplerin gelmesi uzun suruyor. Ve sonradan gelenler oluyor ??!
-        mainIntroducer = App.getMainIntroducer();
-        mainIntroducer.setNodes(new ArrayList<>());
-        mainIntroducer.checkHostsBruteForce(App.subnet);
-        Thread.sleep(1);
-        mainIntroducer.getHostCheckerAll().getHostIps().forEach((node) -> {
-          ListModel IpListBoxModel = IpListBox.getModel();
-          ((DefaultListModel<String>)IpListBoxModel).addElement(node);
-          IpListBox.setModel(IpListBoxModel);
-//          IpListBox.add(node)
-        });
-      } catch (InterruptedException ex) {
-        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-      }
-    });
+    getAndListHosts();
+  }
+
+  private void getAndListHosts() {
+    IpListModel.removeAllElements();
+    introducer.getHostCheckerAll().getHostIps().forEach((node) -> IpListModel.addElement(node));
   }
 
   private void ConnectButtonActionPerformed(ActionEvent evt) {
-    String selectedIp = IpListBox.getSelectedValue().toString();
-//    String selectedIp = IpListBox.getSelectedItem();
+    String selectedIp = IpListModel.getElementAt(IpListBox.getSelectedIndex());
+
+    // TODO If there is no selection then disable the button before here
     if (selectedIp == null) {
       JOptionPane.showMessageDialog(null, "Please choose 1 IP to connect to.");
     } else {
       try {
         String ip = selectedIp.split(" -")[0].replaceAll("/", "");
         Node selectedNode = App.getNode(ip);
-        Connection newConnection = new Connection((Inet4Address) selectedNode.getConnectionIp());
+        Connection newConnection = new Connection(selectedNode.getConnectionIp());
 
         connectionManager.addConnection(newConnection);
         if (connectionManager.startConnection(newConnection)) {
-          ListModel ConnectionListBoxModel = ConnectionListBox.getModel();
-          ((DefaultListModel<String>)ConnectionListBoxModel).addElement(newConnection.getConnectionIp().toString());
-          ConnectionListBox.setModel(ConnectionListBoxModel);
-//          ConnectionListBox.add(newConnection.getConnectionIp().toString());
+          ConnectionListModel.addElement(newConnection.getConnectionIp().toString());
         } else {
           System.out.println("Sorry, could not connect to: " + newConnection.getConnectionIp().toString());
         }
@@ -110,18 +107,14 @@ public class MainForm extends JFrame {
 
       Connection newIncomingConnection = new Connection((Inet4Address) connectionSocket.getInetAddress());
       connectionManager.addConnection(newIncomingConnection);
-      Index nodeIndex = connectionManager.getIndex(connectionSocket);
+//      Index nodeIndex = connectionManager.getIndex(connectionSocket); // FIXME
+//
+//      connectionManager.addToNetworkIndex(nodeIndex);
+//
+//      // connectionManager.networkIndex.getFileHeaders().addAll(incomingData.getFileHeaders());
+//      System.out.println(nodeIndex.getFileHeaders().get(0).getName());
 
-      connectionManager.addToNetworkIndex(nodeIndex);
-
-      // connectionManager.networkIndex.getFileHeaders().addAll(incomingData.getFileHeaders());
-      System.out.println(nodeIndex.getFileHeaders().get(0).getName());
-
-      ListModel ConnectionListBoxModel = ConnectionListBox.getModel();
-      ((DefaultListModel<String>)ConnectionListBoxModel).addElement(newIncomingConnection.getConnectionIp().toString());
-      ConnectionListBox.setModel(ConnectionListBoxModel);
-//      ConnectionListBox.add(newIncomingConnection.getConnectionIp().toString());
-
+      ConnectionListModel.addElement(newIncomingConnection.getConnectionIp().toString());
     } catch (IOException ex) {
       System.out.println("Input Output Exception on Listen Connection Action Performed");
       Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
