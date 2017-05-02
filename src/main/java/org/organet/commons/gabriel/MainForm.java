@@ -30,6 +30,14 @@ public class MainForm extends JFrame {
   public DefaultListModel<String> LocalIndexListModel = new DefaultListModel<>();
 //  private DefaultListModel<String> NetworkIndexListModel = new DefaultListModel<>();
 
+  public DefaultListModel<String> getConnectionListModel() {
+    return ConnectionListModel;
+  }
+
+  public void setConnectionListModel(DefaultListModel<String> connectionListModel) {
+    ConnectionListModel = connectionListModel;
+  }
+
   // TODO Move these to App
   private Introducer introducer;
   private ConnectionManager connectionManager;
@@ -53,7 +61,6 @@ public class MainForm extends JFrame {
 
     ScanNetworkButton.addActionListener(this::ScanNetworkButtonActionPerformed);
     ConnectButton.addActionListener(this::ConnectButtonActionPerformed);
-    listenConnection.addActionListener(this::listenConnectionActionPerformed);
 
     connectionManager = App.getConnectionManager();
     introducer = App.getIntroducer();
@@ -71,6 +78,7 @@ public class MainForm extends JFrame {
 
   private void getAndListHosts() {
     IpListModel.removeAllElements();
+    introducer.getHostCheckerAll().run();
     introducer.getHostCheckerAll().getHostIps().forEach((node) -> IpListModel.addElement(node));
   }
 
@@ -84,7 +92,8 @@ public class MainForm extends JFrame {
       try {
         String ip = selectedIp.split(" -")[0].replaceAll("/", "");
         Node selectedNode = App.getNode(ip);
-        Connection newConnection = new Connection(selectedNode.getConnectionIp());
+        Connection newConnection = connectionManager.createConnection(selectedNode.getConnectionIp());
+//        Connection newConnection = new Connection(selectedNode.getConnectionIp());
 
         connectionManager.addConnection(newConnection);
         if (connectionManager.startConnection(newConnection)) {
@@ -95,29 +104,6 @@ public class MainForm extends JFrame {
       } catch (HeadlessException ex) {
         Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
       }
-    }
-  }
-
-  private void listenConnectionActionPerformed(ActionEvent evt) {
-    try {
-      //Listening for a connection to be made
-      ServerSocket serverSocket = new ServerSocket(connectionManager.getPORT_NO());
-      System.out.println("TCPServer Waiting for client on port 5000\n");
-      Socket connectionSocket = serverSocket.accept();
-
-      Connection newIncomingConnection = new Connection((Inet4Address) connectionSocket.getInetAddress());
-      connectionManager.addConnection(newIncomingConnection);
-//      Index nodeIndex = connectionManager.getIndex(connectionSocket); // FIXME
-//
-//      connectionManager.addToNetworkIndex(nodeIndex);
-//
-//      // connectionManager.networkIndex.getFileHeaders().addAll(incomingData.getFileHeaders());
-//      System.out.println(nodeIndex.getFileHeaders().get(0).getName());
-
-      ConnectionListModel.addElement(newIncomingConnection.getConnectionIp().toString());
-    } catch (IOException ex) {
-      System.out.println("Input Output Exception on Listen Connection Action Performed");
-      Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
 }

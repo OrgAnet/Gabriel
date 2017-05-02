@@ -7,8 +7,9 @@ public class Connection {
   Inet4Address connectionIp;
   Socket connectionSocket;
 
-  public Connection(Inet4Address connectionIp) {
-    this.connectionIp = connectionIp;
+  public Connection(Socket connectionSocket) {
+    this.connectionSocket = connectionSocket;
+    this.connectionIp = (Inet4Address) connectionSocket.getInetAddress();
   }
 
   public Inet4Address getConnectionIp() {

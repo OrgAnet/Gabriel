@@ -4,6 +4,8 @@ import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.inofy.Index;
 
 import java.io.*;
+import java.net.Inet4Address;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -27,6 +29,37 @@ public class ConnectionManager {
   public void addConnection(Connection conn) {
     this.connections.add(conn);
   }
+
+  void startServer(){
+
+    try {
+      //Listening for a connection to be made
+      ServerSocket serverSocket = new ServerSocket(PORT_NO);
+      System.out.println("TCPServer Waiting for client on port "+PORT_NO);
+      while (true) {
+        Socket connectionSocket = serverSocket.accept();
+
+        Connection newIncomingConnection = new Connection(connectionSocket);
+        addConnection(newIncomingConnection);
+
+//      Index nodeIndex = connectionManager.getIndex(connectionSocket); // FIXME
+//
+//      connectionManager.addToNetworkIndex(nodeIndex);
+//
+//      // connectionManager.networkIndex.getFileHeaders().addAll(incomingData.getFileHeaders());
+//      System.out.println(nodeIndex.getFileHeaders().get(0).getName());
+
+        App.mainForm.getConnectionListModel().addElement(newIncomingConnection.getConnectionIp().toString());
+      }
+    } catch (IOException ex) {
+      System.out.println("Input Output Exception on Listen Connection Action Performed");
+      Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+
+
+  }
+
 
   Boolean startConnection(Connection newConnection) {
     try {
@@ -76,5 +109,11 @@ public class ConnectionManager {
       Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
     }
     return incomingIndex;
+  }
+
+  public Connection createConnection(Inet4Address connectionIp) {
+
+//todooo
+    return new Connection(new Socket());
   }
 }
