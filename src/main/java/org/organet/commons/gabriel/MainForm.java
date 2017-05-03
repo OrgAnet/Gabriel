@@ -40,7 +40,6 @@ public class MainForm extends JFrame {
 
   // TODO Move these to App
   private Introducer introducer;
-  private ConnectionManager connectionManager;
 
   MainForm() {
     IpListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -62,7 +61,6 @@ public class MainForm extends JFrame {
     ScanNetworkButton.addActionListener(this::ScanNetworkButtonActionPerformed);
     ConnectButton.addActionListener(this::ConnectButtonActionPerformed);
 
-    connectionManager = App.getConnectionManager();
     introducer = App.getIntroducer();
     introducer.checkHostsBruteForce(App.SUBNET);
     getAndListHosts();
@@ -92,15 +90,10 @@ public class MainForm extends JFrame {
       try {
         String ip = selectedIp.split(" -")[0].replaceAll("/", "");
         Node selectedNode = App.getNode(ip);
-        Connection newConnection = connectionManager.createConnection(selectedNode.getConnectionIp());
-//        Connection newConnection = new Connection(selectedNode.getConnectionIp());
-
-        connectionManager.addConnection(newConnection);
-        if (connectionManager.startConnection(newConnection)) {
+        Connection newConnection = ConnectionManager.createConnection(selectedNode.getConnectionIp());
+        if(newConnection!=null)
           ConnectionListModel.addElement(newConnection.getConnectionIp().toString());
-        } else {
-          System.out.println("Sorry, could not connect to: " + newConnection.getConnectionIp().toString());
-        }
+
       } catch (HeadlessException ex) {
         Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
       }

@@ -12,8 +12,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ConnectionManager {
-  private ArrayList<Connection> connections = new ArrayList<>();
-  private final Integer PORT_NO = 5000;
+  private static ArrayList<Connection> connections = new ArrayList<>();
+  private final static Integer PORT_NO = 5000;
+
+
 
   Index networkIndex = new Index();
 
@@ -21,16 +23,7 @@ public class ConnectionManager {
     return PORT_NO;
   }
 
-  public ConnectionManager() {
-    // TODO
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
-
-  public void addConnection(Connection conn) {
-    this.connections.add(conn);
-  }
-
-  void startServer(){
+  public static void startServer(){
 
     try {
       //Listening for a connection to be made
@@ -40,9 +33,9 @@ public class ConnectionManager {
         Socket connectionSocket = serverSocket.accept();
 
         Connection newIncomingConnection = new Connection(connectionSocket);
-        addConnection(newIncomingConnection);
+        connections.add(newIncomingConnection);
 
-//      Index nodeIndex = connectionManager.getIndex(connectionSocket); // FIXME
+        Index nodeIndex = getRemoteIndex(newIncomingConnection);
 //
 //      connectionManager.addToNetworkIndex(nodeIndex);
 //
@@ -60,21 +53,7 @@ public class ConnectionManager {
 
   }
 
-
-  Boolean startConnection(Connection newConnection) {
-    try {
-      newConnection.setConnectionSocket(new Socket(newConnection.getConnectionIp(), PORT_NO));
-
-      sendData(newConnection, App.localIndex);
-      addConnection(newConnection);
-      return true;
-    } catch (IOException ex) {
-      Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
-      return false;
-    }
-  }
-
-  public void sendData(Connection connection, Index myIndex) {
+  public static void sendData(Connection connection, Index myIndex) {
     try {
       try (OutputStream os = connection.getConnectionSocket().getOutputStream()) {
         ObjectOutputStream objectOS = new ObjectOutputStream(os);
@@ -83,6 +62,12 @@ public class ConnectionManager {
     } catch (IOException ex) {
       Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
     }
+
+  }
+
+  public static Index getRemoteIndex(Connection conn){
+//TODO::
+    return new Index();
 
   }
 
@@ -111,9 +96,19 @@ public class ConnectionManager {
     return incomingIndex;
   }
 
-  public Connection createConnection(Inet4Address connectionIp) {
+  public static Connection createConnection(Inet4Address connectionIp) {
+    Connection newConnection = null;
+    try {
 
-//todooo
-    return new Connection(new Socket());
+      newConnection = new Connection(new Socket(connectionIp,PORT_NO) );
+
+      sendData(newConnection, App.localIndex);
+      connections.add(newConnection);
+      return newConnection;
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.out.println("Couldn't create connection");
+      return null;
+    }
   }
 }

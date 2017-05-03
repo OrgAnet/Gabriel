@@ -42,7 +42,7 @@ public class App {
 
     nodeList = new ArrayList<>();
     introducer = new Introducer(nodeList);
-//    connectionManager = new ConnectionManager();
+    connectionManager = new ConnectionManager();
 
     mainForm = new MainForm();
     mainForm.setVisible(true);
@@ -71,6 +71,16 @@ public class App {
     } catch (IOException e) {
       e.printStackTrace();
     }
+
+    //Start server listening for connections
+    Runnable a = new Runnable() {
+      @Override
+      public void run() {
+        ConnectionManager.startServer();
+      }
+    };
+
+
   }
 
   private static void calculatePossibleHostsCount() {
@@ -81,10 +91,6 @@ public class App {
 
   static Introducer getIntroducer() {
     return introducer;
-  }
-
-  static ConnectionManager getConnectionManager() {
-    return connectionManager;
   }
 
   static Node getNode(String ipAddress) {
