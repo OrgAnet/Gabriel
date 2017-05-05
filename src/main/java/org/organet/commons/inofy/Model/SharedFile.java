@@ -116,5 +116,9 @@ public class SharedFile extends File implements Serializable {
     return keywords.contains(keyword);
   }
 
+  public String getScreenName(){
+    return getName();
+  }
+
   // TODO `compareTo()`
 }

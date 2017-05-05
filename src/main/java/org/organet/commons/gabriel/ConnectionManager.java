@@ -2,6 +2,7 @@ package org.organet.commons.gabriel;
 
 import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.inofy.Index;
+import org.organet.commons.inofy.Model.SharedFile;
 
 import java.io.*;
 import java.net.Inet4Address;
@@ -17,7 +18,7 @@ public class ConnectionManager {
   private static ArrayList<Connection> connections = new ArrayList<>();
   private final static Integer PORT_NO = 5000;
 
-  Index networkIndex = new Index();
+  static Index networkIndex = new Index();
   Map<String, Index> remoteIndeces = new HashMap<>(); // TODO Emre will implement this
   //  connectionId, (de-serialized) remote Index class
 
@@ -25,25 +26,22 @@ public class ConnectionManager {
     return PORT_NO;
   }
 
-  public static void startServer(){
+  public static void  startServer(){
     try {
       //Listening for a connection to be made
+        System.out.println("server started");
       ServerSocket serverSocket = new ServerSocket(PORT_NO);
       System.out.println("TCPServer Waiting for client on port "+PORT_NO);
       while (true) {
         Socket connectionSocket = serverSocket.accept();
 
         Connection newIncomingConnection = new Connection(connectionSocket);
+
+        getRemoteIndex(newIncomingConnection);
+
         connections.add(newIncomingConnection);
 
-//        Index nodeIndex = getRemoteIndex(newIncomingConnection);
-//
-//      connectionManager.addToNetworkIndex(nodeIndex);
-//
-//      // connectionManager.networkIndex.getFileHeaders().addAll(incomingData.getFileHeaders());
-//      System.out.println(nodeIndex.getFileHeaders().get(0).getName());
-
-        App.mainForm.getConnectionListModel().addElement(newIncomingConnection.getConnectionIp().toString());
+       // App.mainForm.getConnectionListModel().addElement(newIncomingConnection.getConnectionIp().toString());
       }
     } catch (IOException ex) {
       System.out.println("Input Output Exception on Listen Connection Action Performed");
@@ -51,23 +49,46 @@ public class ConnectionManager {
     }
   }
 
-  public static void sendData(Connection connection, Index myIndex) {
+  public static void sendIndex(Connection connection, Index myIndex) {
     try {
       try (OutputStream os = connection.getConnectionSocket().getOutputStream()) {
-        ObjectOutputStream objectOS = new ObjectOutputStream(os);
+        ObjectOutputStream objectOS = new ObjectOutputStream(new BufferedOutputStream(os));
         objectOS.writeObject(myIndex);
+        objectOS.close();
       }
     } catch (IOException ex) {
       Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
     }
-
   }
 
   public static void getRemoteIndex(Connection conn) {
-    // TODO
+    try {
+      ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(conn.getConnectionSocket().getInputStream()));
+      Index remoteIndex=new Index();
+      boolean flag = true;
+      while(flag){
+          try{
+              remoteIndex = (Index) in.readObject();
+              flag = false;
+          }catch(EOFException ex){
+              flag=true;
+          }
+      }
+        System.out.println("Index read successfully: " + remoteIndex.toString());
+        conn.setConnectionIndex(remoteIndex);
+        networkIndex.addAllSharedFiles(remoteIndex);
+        for (SharedFile sh :networkIndex.getSharedFiles()) {
+            conn.getConnectionIndex().add(sh);
+            App.mainForm.getNetworkIndexListModel().addElement(sh.getScreenName());
+        }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+        e.printStackTrace();
+    }
   }
 
-  public static void sendLocalIndex() {
+  public static void broadcastLocalIndex() {
     //TODO send local index to all connections
   }
 
@@ -80,30 +101,13 @@ public class ConnectionManager {
     this.networkIndex = networkIndex;
   }
 
-//  void addToNetworkIndex(Index incomingIndex) { // FIXME
-//    this.networkIndex.getFileHeaders().addAll(incomingIndex.getFileHeaders());
-//  }
-
-  Index getIndex(Socket connectionSocket) {
-    Index incomingIndex = null;
-    try {
-      //Getting the ObjectInputStream to retrive file index
-      ObjectInputStream incomingStream = new ObjectInputStream(new BufferedInputStream(connectionSocket.getInputStream()));
-
-      incomingIndex = (Index) incomingStream.readObject();
-    } catch (IOException | ClassNotFoundException ex) {
-      Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
-    }
-    return incomingIndex;
-  }
-
   public static Connection createConnection(Inet4Address connectionIp) {
     Connection newConnection = null;
     try {
 
-      newConnection = new Connection(new Socket(connectionIp,PORT_NO) );
+      newConnection = new Connection(new Socket(connectionIp.getHostAddress(),PORT_NO) );
 
-      sendData(newConnection, App.localIndex);
+      sendIndex(newConnection, App.localIndex);
       connections.add(newConnection);
       return newConnection;
     } catch (IOException e) {

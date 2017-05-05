@@ -1,8 +1,10 @@
 package org.organet.commons.gabriel;
 
 import org.organet.commons.gabriel.Controller.Introducer;
+import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.gabriel.Model.Node;
 import org.organet.commons.inofy.Index;
+import org.organet.commons.inofy.Model.SharedFile;
 import org.organet.commons.inofy.Watcher;
 
 import java.io.File;
@@ -14,6 +16,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -57,6 +61,8 @@ public class App {
         if (Files.isRegularFile(filePath)) {
           // FIXME Implement this behaviour in another way (i.e. anywhere else)
           App.mainForm.LocalIndexListModel.addElement(filePath.toFile().getName());
+            SharedFile sh = new SharedFile(filePath.toFile().getName());
+            localIndex.add(sh);
         }
       });
     } catch (IOException e) {
@@ -66,22 +72,30 @@ public class App {
     }
 
     // Watch the shared directory directory recursively for changes
-    try {
-      (new Watcher(sharedDir.getPath())).run();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
 
-    //Start server listening for connections
-    Runnable a = new Runnable() {
-      @Override
-      public void run() {
-        ConnectionManager.startServer();
-      }
-    };
-
+      App.startWatcherExecutor( sharedDir);
+      App.startServerExecutor();
 
   }
+
+  private static void startWatcherExecutor(File sharedDir){
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
+      Watcher w = null;
+      try {
+          w= new Watcher(sharedDir.getPath());
+      } catch (IOException e) {
+          e.printStackTrace();
+      }
+      executorService.submit(w::run);
+    executorService.shutdown();
+  }
+
+  private static void startServerExecutor() {
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
+    executorService.submit(ConnectionManager::startServer);
+    executorService.shutdown();
+  }
+
 
   private static void calculatePossibleHostsCount() {
     String[] splittedSUBNET = SUBNET.split("\\.");

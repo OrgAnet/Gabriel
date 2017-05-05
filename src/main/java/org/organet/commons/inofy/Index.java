@@ -15,6 +15,10 @@ public class Index implements Serializable {
     sharedFiles = new ArrayList<>();
   }
 
+  public ArrayList<SharedFile> getSharedFiles() {
+    return sharedFiles;
+  }
+
   public int size() {
     return sharedFiles.size();
   }
@@ -135,4 +139,18 @@ public class Index implements Serializable {
 
     return foundSharedFiles;
   }
+
+  @Override
+  public String toString() {
+    return "Index{" +
+            "sharedFiles=" + sharedFiles +
+            '}';
+  }
+
+  public void addAllSharedFiles(Index newIndex){
+    for (int i=0;i<newIndex.size();i++){
+      this.add(newIndex.get(i));
+    }
+  }
+
 }

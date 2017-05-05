@@ -3,6 +3,7 @@ package org.organet.commons.gabriel;
 import org.organet.commons.gabriel.Controller.Introducer;
 import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.gabriel.Model.Node;
+import org.organet.commons.inofy.Model.SharedFile;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +29,7 @@ public class MainForm extends JFrame {
   private DefaultListModel<String> IpListModel = new DefaultListModel<>();
   private DefaultListModel<String> ConnectionListModel = new DefaultListModel<>();
   public DefaultListModel<String> LocalIndexListModel = new DefaultListModel<>();
-//  private DefaultListModel<String> NetworkIndexListModel = new DefaultListModel<>();
+  private DefaultListModel<String> NetworkIndexListModel = new DefaultListModel<>();
 
   public DefaultListModel<String> getConnectionListModel() {
     return ConnectionListModel;
@@ -36,6 +37,10 @@ public class MainForm extends JFrame {
 
   public void setConnectionListModel(DefaultListModel<String> connectionListModel) {
     ConnectionListModel = connectionListModel;
+  }
+
+  public DefaultListModel<String> getNetworkIndexListModel() {
+    return NetworkIndexListModel;
   }
 
   // TODO Move these to App
@@ -56,7 +61,7 @@ public class MainForm extends JFrame {
 
     NetworkIndexListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     NetworkIndexListBox.setLayoutOrientation(JList.VERTICAL);
-//    NetworkIndexListBox.setModel(NetworkIndexListModel);
+    NetworkIndexListBox.setModel(NetworkIndexListModel);
 
     ScanNetworkButton.addActionListener(this::ScanNetworkButtonActionPerformed);
     ConnectButton.addActionListener(this::ConnectButtonActionPerformed);
@@ -90,8 +95,12 @@ public class MainForm extends JFrame {
         String ip = selectedIp.split(" -")[0].replaceAll("/", "");
         Node selectedNode = App.getNode(ip);
         Connection newConnection = ConnectionManager.createConnection(selectedNode.getConnectionIp());
-        if(newConnection!=null)
+        if(newConnection!=null) {
           ConnectionListModel.addElement(newConnection.getConnectionIp().toString());
+          for (SharedFile sh : newConnection.getConnectionIndex().getSharedFiles()) {
+            getNetworkIndexListModel().addElement(sh.getScreenName());
+          }
+        }
 
       } catch (HeadlessException ex) {
         Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
