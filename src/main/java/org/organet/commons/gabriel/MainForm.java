@@ -63,7 +63,6 @@ public class MainForm extends JFrame {
 
     introducer = App.getIntroducer();
     introducer.checkHostsBruteForce(App.SUBNET);
-    getAndListHosts();
 
     setContentPane(panelMain);
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

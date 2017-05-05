@@ -29,10 +29,14 @@ public class Watcher implements Runnable {
     keys = new HashMap<>();
 
     registerAll(dir);
+
+    FileTypes.initialize();
   }
 
   public Watcher(String path) throws IOException {
     this(Paths.get(path));
+
+    FileTypes.initialize();
   }
 
   /**

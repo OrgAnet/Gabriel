@@ -1,26 +1,30 @@
 package org.organet.commons.inofy.Model;
 
+import org.organet.commons.inofy.FileTypes;
 import org.organet.commons.inofy.Hasher;
+import org.organet.commons.inofy.KeywordList;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 // FIXME Do NOT extend File
 public class SharedFile extends File implements Serializable {
   private String ndnid = null; // Named Data Network Identifier
+  private String ndntype = null; // Named Data Network File Type
+  private List<String> keywords = new KeywordList<>(); // TODO
+//  private List<String> keywords = new ArrayList<>(); // TODO
   private transient String localPath = null; // Absolute path of the file, MUST be set by Watcher, TODO when not extending the File, rename it to 'path
   private transient long lastModified = -1; // TODO Is this really necessary?
-  private String mimeType = null;
   private String hash = null; // TODO Is this transient or not?
   private long size = -1;
 
   private void initialize() {
-    probeMimeType();
-
-    // `probeMimeType` method sets the `mimeType` field
+    ndntype = FileTypes.getFileType(getExtension());
     hash = getHash();
   }
 
@@ -57,14 +61,18 @@ public class SharedFile extends File implements Serializable {
     return ndnid;
   }
 
-  private void probeMimeType() {
-    // TODO Implement `probeMimeType` method
+  String getExtension() {
+    String name = getName();
 
-    mimeType = "text/plain";
+    try {
+      return name.substring(name.lastIndexOf(".") + 1).toLowerCase();
+    } catch (Exception e) {
+      return "";
+    }
   }
 
-  String getMimeType() {
-    return mimeType;
+  String getNDNType() {
+    return ndntype;
   }
 
   String getLocalPath() {
@@ -101,6 +109,11 @@ public class SharedFile extends File implements Serializable {
 
   boolean isRemoteFile() {
     return (getPath() == null && lastModified == -1);
+  }
+
+  // Keyword can be Java regex string
+  public boolean hasKeyword(String keyword) {
+    return keywords.contains(keyword);
   }
 
   // TODO `compareTo()`

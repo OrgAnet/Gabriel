@@ -6,6 +6,7 @@ import java.net.Socket;
 public class Connection {
   Inet4Address connectionIp;
   Socket connectionSocket;
+  String connectionId;
 
   public Connection(Socket connectionSocket) {
     this.connectionSocket = connectionSocket;

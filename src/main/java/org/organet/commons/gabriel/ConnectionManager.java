@@ -8,6 +8,8 @@ import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,16 +17,15 @@ public class ConnectionManager {
   private static ArrayList<Connection> connections = new ArrayList<>();
   private final static Integer PORT_NO = 5000;
 
-
-
   Index networkIndex = new Index();
+  Map<String, Index> remoteIndeces = new HashMap<>(); // TODO Emre will implement this
+  //  connectionId, (de-serialized) remote Index class
 
   public Integer getPORT_NO() {
     return PORT_NO;
   }
 
   public static void startServer(){
-
     try {
       //Listening for a connection to be made
       ServerSocket serverSocket = new ServerSocket(PORT_NO);
@@ -35,7 +36,7 @@ public class ConnectionManager {
         Connection newIncomingConnection = new Connection(connectionSocket);
         connections.add(newIncomingConnection);
 
-        Index nodeIndex = getRemoteIndex(newIncomingConnection);
+//        Index nodeIndex = getRemoteIndex(newIncomingConnection);
 //
 //      connectionManager.addToNetworkIndex(nodeIndex);
 //
@@ -48,9 +49,6 @@ public class ConnectionManager {
       System.out.println("Input Output Exception on Listen Connection Action Performed");
       Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
     }
-
-
-
   }
 
   public static void sendData(Connection connection, Index myIndex) {
@@ -65,11 +63,14 @@ public class ConnectionManager {
 
   }
 
-  public static Index getRemoteIndex(Connection conn){
-//TODO::
-    return new Index();
-
+  public static void getRemoteIndex(Connection conn) {
+    // TODO
   }
+
+  public static void sendLocalIndex() {
+    //TODO send local index to all connections
+  }
+
 
   public Index getNetworkIndex() {
     return networkIndex;

@@ -5,6 +5,7 @@ import org.organet.commons.inofy.Model.SharedFile;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 // TODO `implements Serializable` or `.serialize()`
 public class Index implements Serializable {
@@ -34,14 +35,20 @@ public class Index implements Serializable {
 
   public boolean add(SharedFile sharedFile) {
     return sharedFiles.add(sharedFile);
+    // TODO Invoke the necessary method to propagate the updated index
+    // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
   public boolean remove(SharedFile sharedFile) {
     return sharedFiles.remove(sharedFile);
+    // TODO Invoke the necessary method to propagate the updated index
+    // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
   public void clear() {
     sharedFiles.clear();
+    // TODO Invoke the necessary method to propagate the updated index
+    // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
   public SharedFile get(int index) {
@@ -71,6 +78,8 @@ public class Index implements Serializable {
     }
 
     return itemToBeRemoved;
+    // TODO Invoke the necessary method to propagate the updated index
+    // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
   public SharedFile remove(Path filename) {
@@ -86,6 +95,8 @@ public class Index implements Serializable {
     }
 
     return itemToBeRemoved;
+    // TODO Invoke the necessary method to propagate the updated index
+    // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
   public int indexOf(String ndnid) {
@@ -109,5 +120,19 @@ public class Index implements Serializable {
       // doesn't exist - add the given shared file
       return add(sharedFile);
     }
+    // TODO Invoke the necessary method to propagate the updated index
+    // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
+  }
+
+  public List<SharedFile> search(String keyword) {
+    List<SharedFile> foundSharedFiles = new ArrayList<>();
+
+    for (SharedFile sharedFile : sharedFiles) {
+      if (sharedFile.hasKeyword(keyword)) {
+        foundSharedFiles.add(sharedFile);
+      }
+    }
+
+    return foundSharedFiles;
   }
 }
