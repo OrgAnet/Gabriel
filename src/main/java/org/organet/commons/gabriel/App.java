@@ -22,7 +22,6 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class App {
-  final static int RANDOM_PORT = 5000;
   final static String SUBNET = "192.168.1";
 
   public static Index localIndex = null;

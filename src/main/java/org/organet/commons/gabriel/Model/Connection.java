@@ -17,6 +17,10 @@ public class Connection {
 
   Index connectionIndex;
 
+
+  OutputStream os;
+  InputStream is;
+
   public Index getConnectionIndex() {
     return connectionIndex;
   }
@@ -28,6 +32,12 @@ public class Connection {
   public Connection(Socket connectionSocket) {
     this.connectionSocket = connectionSocket;
     this.connectionIp = (Inet4Address) connectionSocket.getInetAddress();
+    try {
+      this.os = connectionSocket.getOutputStream();
+      this.is = connectionSocket.getInputStream();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
   public Inet4Address getConnectionIp() {
@@ -51,22 +61,26 @@ public class Connection {
     return "Connection{" + "connectionIp=" + connectionIp + '}';
   }
 
-    public void requestFile(String ndnid) {
-      try {
+  public void requestFile(String ndnid) {
+    try {
 
-        System.out.println(connectionSocket);
+      System.out.println(connectionSocket);
+      OutputStream os = connectionSocket.getOutputStream();
 
-        OutputStream os = connectionSocket.getOutputStream();
-
-        os.write( ("GET "+ ndnid).getBytes());
-        os.close();
-
+      os.write(("GET " + ndnid).getBytes());
+      os.close();
 
 
-
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+
+  }
+
+  public OutputStream getOutputStream() {
+    return os;
+  }
+  public InputStream getInputStream() {
+    return is;
+  }
 }

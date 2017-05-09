@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 public class ConnectionManager {
   private static ArrayList<Connection> connections = new ArrayList<>();
-  private final static Integer PORT_NO = 5000;
+  private final static Integer PORT_NO = 5001;
 
   static Index networkIndex = new Index(false);
   Map<String, Index> remoteIndeces = new HashMap<>(); // TODO Emre will implement this
@@ -51,20 +51,23 @@ public class ConnectionManager {
   }
 
   public static void sendIndex(Connection connection, Index myIndex) {
+
+    ObjectOutputStream objectOS = null;
     try {
-      try (OutputStream os = connection.getConnectionSocket().getOutputStream()) {
-        ObjectOutputStream objectOS = new ObjectOutputStream(new BufferedOutputStream(os));
-        objectOS.writeObject(myIndex);
-        objectOS.close();
-      }
-    } catch (IOException ex) {
-      Logger.getLogger(ConnectionManager.class.getName()).log(Level.SEVERE, null, ex);
+      objectOS = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+      objectOS.writeObject(myIndex);
+      objectOS.flush();
+
+    } catch (IOException e) {
+      e.printStackTrace();
     }
+//        objectOS.close();
+
   }
 
   public static void getRemoteIndex(Connection conn) {
     try {
-      ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(conn.getConnectionSocket().getInputStream()));
+      ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(conn.getInputStream()));
       Index remoteIndex=new Index(false);
       boolean flag = true;
       while(flag){
@@ -133,7 +136,7 @@ public class ConnectionManager {
 
     System.out.println(networkSharedFileHeader.toString());
 
-    connections.get(1).requestFile(networkSharedFileHeader.getNDNID());
+    //connections.get(0).requestFile(networkSharedFileHeader.getNDNID());
 
 
   }
