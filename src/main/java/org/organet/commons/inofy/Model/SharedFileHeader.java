@@ -21,6 +21,15 @@ public class SharedFileHeader extends File implements Serializable {
   private transient String localPath = null; // Absolute path of the file, MUST be set by Watcher, TODO when not extending the File, rename it to 'path
   private transient long lastModified = -1; // TODO Is this really necessary?
   private String hash = null; // TODO Is this transient or not?
+
+  public String getIp() {
+    return ip;
+  }
+
+  public void setIp(String ip) {
+    this.ip = ip;
+  }
+
   private String ip;
 
   private ArrayList<String> keywords = new ArrayList<>();
@@ -28,7 +37,7 @@ public class SharedFileHeader extends File implements Serializable {
 
   private void initialize() {
     ndntype = FileTypes.getFileType(getExtension());
-    keywords.add("Document");
+    keywords.add(getName());
     try {
       ip = InetAddress.getLocalHost().getHostAddress().toString();
     } catch (UnknownHostException e) {

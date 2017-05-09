@@ -42,6 +42,7 @@ public class MainForm extends JFrame {
     private JButton addKeyword;
     private JTextField keywordsTextField;
     private JButton deleteKeyword;
+    private JTextArea fileHeaderInfo;
 
     private DefaultListModel<String> IpListModel = new DefaultListModel<>();
   private DefaultListModel<String> ConnectionListModel = new DefaultListModel<>();
@@ -93,6 +94,7 @@ public class MainForm extends JFrame {
     ConnectButton.addActionListener(this::ConnectButtonActionPerformed);
     downloadButton.addActionListener(this::downloadButtonActionPerformed);
 
+//      FileDetailsLabel.se
 
     introducer = App.getIntroducer();
 
@@ -100,10 +102,6 @@ public class MainForm extends JFrame {
     panelMain.repaint();
     revalidate();
 
-    getAndListHosts();
-    setContentPane(panelMain);
-    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    pack();
     keywords.setModel(KeywordsModel);
       keywords.addMouseListener(new MouseAdapter() {
           @Override
@@ -124,7 +122,14 @@ public class MainForm extends JFrame {
               SharedFileHeader sfh = App.localIndex.findIndex(name);
               App.chosenSharedFileHeader = sfh;
               sfh.getKeywords().forEach(p-> KeywordsModel.addElement(p.toString()));
+              fillFileHeader(sfh);
 
+          }
+
+          private void fillFileHeader(SharedFileHeader sfh) {
+              fileHeaderInfo.setText(sfh.getName() + "\nKeywords: " + sfh.getKeywords() );
+              fileHeaderInfo.append("\nNamed Data Networking ID:" + sfh.getNDNID());
+              fileHeaderInfo.append("\nIP: " + sfh.getIp());
           }
       });
       deleteKeyword.addActionListener(new ActionListener() {
@@ -136,9 +141,32 @@ public class MainForm extends JFrame {
                     return;
                 }
               App.chosenSharedFileHeader.getKeywords().remove(keyword);
-              KeywordsModel.removeAllElements();
+              KeywordsModel.removeElement(keyword);
           }
       });
+      addKeyword.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+              if(App.chosenSharedFileHeader == null){
+                  JOptionPane.showMessageDialog(null, "Please choose 1 File to add keyword.");
+                    return;
+              }
+              if(keywordsTextField == null || keywordsTextField.getText().length()==0 ){
+                  JOptionPane.showMessageDialog(null, "Please write keyword to add.");
+                    return;
+              }
+              App.chosenSharedFileHeader.getKeywords().add(keywordsTextField.getText());
+              KeywordsModel.addElement(keywordsTextField.getText());
+              keywordsTextField.setText("");
+
+          }
+      });
+
+
+      getAndListHosts();
+      setContentPane(panelMain);
+      setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+      pack();
   }
 
   private void downloadButtonActionPerformed(ActionEvent evt) {
