@@ -3,16 +3,10 @@ package org.organet.commons.gabriel;
 import org.organet.commons.gabriel.Controller.Introducer;
 import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.gabriel.Model.Node;
-import org.organet.commons.inofy.Model.SharedFile;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

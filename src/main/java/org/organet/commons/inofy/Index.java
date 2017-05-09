@@ -1,6 +1,6 @@
 package org.organet.commons.inofy;
 
-import org.organet.commons.inofy.Model.SharedFile;
+import org.organet.commons.inofy.Model.SharedFileHeader;
 
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -9,26 +9,26 @@ import java.util.List;
 
 // TODO `implements Serializable` or `.serialize()`
 public class Index implements Serializable {
-  private ArrayList<SharedFile> sharedFiles;
+  private ArrayList<SharedFileHeader> sharedFileHeaders;
   private boolean isLocal;
 
   public Index(boolean isLocal) {
-    sharedFiles = new ArrayList<>();
+    sharedFileHeaders = new ArrayList<>();
     this.isLocal = isLocal;
   }
 
-  public ArrayList<SharedFile> getSharedFiles() {
-    return sharedFiles;
+  public ArrayList<SharedFileHeader> getSharedFileHeaders() {
+    return sharedFileHeaders;
   }
 
   public int size() {
-    return sharedFiles.size();
+    return sharedFileHeaders.size();
   }
 
   // Performance O(N)
   public boolean contains(String ndnid) {
-    for (SharedFile sharedFile : sharedFiles) {
-      if (sharedFile.getNDNID().equals(ndnid)) {
+    for (SharedFileHeader sharedFileHeader : sharedFileHeaders) {
+      if (sharedFileHeader.getNDNID().equals(ndnid)) {
         return true;
       }
     }
@@ -37,47 +37,47 @@ public class Index implements Serializable {
   }
 
   // TODO Other 'contains' methods may be implemented \
-  // (e.g. `.contains(SharedFile ...)` or `.contains(File ...`)
+  // (e.g. `.contains(SharedFileHeader ...)` or `.contains(File ...`)
 
-  public boolean add(SharedFile sharedFile) {
-    return sharedFiles.add(sharedFile);
+  public boolean add(SharedFileHeader sharedFileHeader) {
+    return sharedFileHeaders.add(sharedFileHeader);
     // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
-  public boolean remove(SharedFile sharedFile) {
-    return sharedFiles.remove(sharedFile);
+  public boolean remove(SharedFileHeader sharedFileHeader) {
+    return sharedFileHeaders.remove(sharedFileHeader);
     // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
   public void clear() {
-    sharedFiles.clear();
+    sharedFileHeaders.clear();
     // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
-  public SharedFile get(int index) {
-    return sharedFiles.get(index);
+  public SharedFileHeader get(int index) {
+    return sharedFileHeaders.get(index);
   }
 
-  public SharedFile get(String ndnid) {
-    for (SharedFile sharedFile : sharedFiles) {
-      if (sharedFile.getNDNID().equals(ndnid)) {
-        return sharedFile;
+  public SharedFileHeader get(String ndnid) {
+    for (SharedFileHeader sharedFileHeader : sharedFileHeaders) {
+      if (sharedFileHeader.getNDNID().equals(ndnid)) {
+        return sharedFileHeader;
       }
     }
 
     return null;
   }
 
-  public SharedFile remove(String ndnid) {
-    SharedFile itemToBeRemoved = null;
+  public SharedFileHeader remove(String ndnid) {
+    SharedFileHeader itemToBeRemoved = null;
 
-    for (int i = 0, len = sharedFiles.size(); i < len; i++) {
-      if (sharedFiles.get(i).getNDNID().equals(ndnid)) {
-        itemToBeRemoved = sharedFiles.get(i);
-        sharedFiles.remove(i);
+    for (int i = 0, len = sharedFileHeaders.size(); i < len; i++) {
+      if (sharedFileHeaders.get(i).getNDNID().equals(ndnid)) {
+        itemToBeRemoved = sharedFileHeaders.get(i);
+        sharedFileHeaders.remove(i);
 
         break;
       }
@@ -88,13 +88,13 @@ public class Index implements Serializable {
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
-  public SharedFile remove(Path filename) {
-    SharedFile itemToBeRemoved = null;
+  public SharedFileHeader remove(Path filename) {
+    SharedFileHeader itemToBeRemoved = null;
 
-    for (int i = 0, len = sharedFiles.size(); i < len; i++) {
-      if (sharedFiles.get(i).getPath().equals(filename)) {
-        itemToBeRemoved = sharedFiles.get(i);
-        sharedFiles.remove(i);
+    for (int i = 0, len = sharedFileHeaders.size(); i < len; i++) {
+      if (sharedFileHeaders.get(i).getPath().equals(filename)) {
+        itemToBeRemoved = sharedFileHeaders.get(i);
+        sharedFileHeaders.remove(i);
 
         break;
       }
@@ -106,8 +106,8 @@ public class Index implements Serializable {
   }
 
   public int indexOf(String ndnid) {
-    for (int i = 0, len = sharedFiles.size(); i < len; i++) {
-      if (sharedFiles.get(i).getNDNID().equals(ndnid)) {
+    for (int i = 0, len = sharedFileHeaders.size(); i < len; i++) {
+      if (sharedFileHeaders.get(i).getNDNID().equals(ndnid)) {
         return i;
       }
     }
@@ -116,36 +116,36 @@ public class Index implements Serializable {
   }
 
   // NOTE This method can be considered `.set(int, element)` of List interface
-  public boolean update(String ndnid, SharedFile sharedFile) {
+  public boolean update(String ndnid, SharedFileHeader sharedFileHeader) {
     int index = indexOf(ndnid);
 
     if (index > -1) {
       // exists - replace with the given one
-      return (sharedFiles.set(index, sharedFile).getNDNID().equals(ndnid));
+      return (sharedFileHeaders.set(index, sharedFileHeader).getNDNID().equals(ndnid));
     } else {
       // doesn't exist - add the given shared file
-      return add(sharedFile);
+      return add(sharedFileHeader);
     }
     // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
-  public List<SharedFile> search(String keyword) {
-    List<SharedFile> foundSharedFiles = new ArrayList<>();
+  public List<SharedFileHeader> search(String keyword) {
+    List<SharedFileHeader> foundSharedFileHeaders = new ArrayList<>();
 
-    for (SharedFile sharedFile : sharedFiles) {
-      if (sharedFile.hasKeyword(keyword)) {
-        foundSharedFiles.add(sharedFile);
+    for (SharedFileHeader sharedFileHeader : sharedFileHeaders) {
+      if (sharedFileHeader.hasKeyword(keyword)) {
+        foundSharedFileHeaders.add(sharedFileHeader);
       }
     }
 
-    return foundSharedFiles;
+    return foundSharedFileHeaders;
   }
 
   @Override
   public String toString() {
     return "Index{" +
-            "sharedFiles=" + sharedFiles +
+            "sharedFileHeaders=" + sharedFileHeaders +
             '}';
   }
 
@@ -155,14 +155,14 @@ public class Index implements Serializable {
     }
   }
 
-  public SharedFile findIndex(String selectedFileScreenName) {
-    for (SharedFile sh :
-            this.getSharedFiles()) {
+  public SharedFileHeader findIndex(String selectedFileScreenName) {
+    for (SharedFileHeader sh :
+            this.getSharedFileHeaders()) {
       if (sh.getScreenName().equals(selectedFileScreenName))
         return sh;
     }
 
-    System.out.println("SharedFile couldn't find on networkIndex");
+    System.out.println("SharedFileHeader couldn't find on networkIndex");
     return null;
   }
 

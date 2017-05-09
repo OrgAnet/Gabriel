@@ -2,7 +2,7 @@ package org.organet.commons.gabriel;
 
 import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.inofy.Index;
-import org.organet.commons.inofy.Model.SharedFile;
+import org.organet.commons.inofy.Model.SharedFileHeader;
 
 import java.io.*;
 import java.net.Inet4Address;
@@ -77,7 +77,7 @@ public class ConnectionManager {
         System.out.println("Index read successfully: " + remoteIndex.toString());
         conn.setConnectionIndex(remoteIndex);
         networkIndex.addAllSharedFiles(remoteIndex);
-        for (SharedFile sh :networkIndex.getSharedFiles()) {
+        for (SharedFileHeader sh :networkIndex.getSharedFileHeaders()) {
             conn.getConnectionIndex().add(sh);
             App.mainForm.getNetworkIndexListModel().addElement(sh.getScreenName());
         }
@@ -126,9 +126,9 @@ public class ConnectionManager {
       return ;
     }
 
-    SharedFile networkSharedFile = networkIndex.findIndex(selectedFileScreenName);
+    SharedFileHeader networkSharedFileHeader = networkIndex.findIndex(selectedFileScreenName);
 
-    System.out.println(networkSharedFile.toString());
+    System.out.println(networkSharedFileHeader.toString());
 
 
   }

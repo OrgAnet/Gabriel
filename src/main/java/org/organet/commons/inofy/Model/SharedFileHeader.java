@@ -9,11 +9,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 // FIXME Do NOT extend File
-public class SharedFile extends File implements Serializable {
+public class SharedFileHeader extends File implements Serializable {
   private String ndnid = null; // Named Data Network Identifier
   private String ndntype = null; // Named Data Network File Type
   private List<String> keywords = new KeywordList<>(); // TODO
@@ -27,33 +26,33 @@ public class SharedFile extends File implements Serializable {
     hash = getHash();
   }
 
-  public SharedFile(String pathname) {
+  public SharedFileHeader(String pathname) {
     super(pathname);
     localPath = pathname;
 
     initialize();
   }
 
-  public SharedFile(String parent, String child) {
+  public SharedFileHeader(String parent, String child) {
     super(parent, child);
 
     initialize();
   }
 
-  public SharedFile(File parent, String child) {
+  public SharedFileHeader(File parent, String child) {
     super(parent, child);
 
     initialize();
   }
 
-  public SharedFile(URI uri) {
+  public SharedFileHeader(URI uri) {
     super(uri);
 
     initialize();
   }
 
-  public static SharedFile fromFile(File file) {
-    return new SharedFile(file.getPath());
+  public static SharedFileHeader fromFile(File file) {
+    return new SharedFileHeader(file.getPath());
   }
 
   public String getNDNID() {
@@ -124,7 +123,7 @@ public class SharedFile extends File implements Serializable {
 
   @Override
   public String toString() {
-    return "SharedFile{" +
+    return "SharedFileHeader{" +
             "ndnid='" + ndnid + '\'' +
             ", ndntype='" + ndntype + '\'' +
             ", keywords=" + keywords +

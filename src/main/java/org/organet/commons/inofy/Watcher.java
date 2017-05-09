@@ -1,7 +1,7 @@
 package org.organet.commons.inofy;
 
 import org.organet.commons.gabriel.App;
-import org.organet.commons.inofy.Model.SharedFile;
+import org.organet.commons.inofy.Model.SharedFileHeader;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -129,7 +129,7 @@ public class Watcher implements Runnable {
 
           if (kind == ENTRY_CREATE) {
             // Create a shared file and add to the local index
-            SharedFile sh = new SharedFile(child.toString());
+            SharedFileHeader sh = new SharedFileHeader(child.toString());
             App.localIndex.add(sh);
             System.out.println("new Shared File: " + sh.toString());
             // FIXME Implement this behaviour in another way (i.e. anywhere else) \

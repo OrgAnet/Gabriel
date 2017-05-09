@@ -1,10 +1,9 @@
 package org.organet.commons.gabriel;
 
 import org.organet.commons.gabriel.Controller.Introducer;
-import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.gabriel.Model.Node;
 import org.organet.commons.inofy.Index;
-import org.organet.commons.inofy.Model.SharedFile;
+import org.organet.commons.inofy.Model.SharedFileHeader;
 import org.organet.commons.inofy.Watcher;
 
 import java.io.File;
@@ -24,7 +23,7 @@ import java.util.stream.Stream;
 
 public class App {
   final static int RANDOM_PORT = 5000;
-  final static String SUBNET = "10.253.127";
+  final static String SUBNET = "192.168.1";
 
   public static Index localIndex = null;
 
@@ -61,7 +60,7 @@ public class App {
         if (Files.isRegularFile(filePath)) {
           // FIXME Implement this behaviour in another way (i.e. anywhere else)
             App.mainForm.LocalIndexListModel.addElement(filePath.toFile().getName());
-            SharedFile sh = SharedFile.fromFile(filePath.toFile());
+            SharedFileHeader sh = SharedFileHeader.fromFile(filePath.toFile());
             localIndex.add(sh);
         }
       });
