@@ -35,6 +35,8 @@ public class App {
 
   public static MainForm mainForm;
 
+  public static SharedFileHeader chosenSharedFileHeader;
+
   public static void main(String args[]) {
     if (args.length < 1) {
       System.out.println("Shared directory path is missing, first argument must be a valid path.");
@@ -97,7 +99,6 @@ public class App {
     executorService.shutdown();
   }
 
-
   private static void calculatePossibleHostsCount() {
     String[] splittedSUBNET = SUBNET.split("\\.");
 
@@ -116,8 +117,6 @@ public class App {
     }
 
     try {
-      System.out.println("gelen ip `" + ipAddress + "`");
-
       return new Node((Inet4Address) InetAddress.getByName(ipAddress));
     } catch (UnknownHostException ex) {
       Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);

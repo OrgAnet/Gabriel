@@ -3,10 +3,17 @@ package org.organet.commons.gabriel;
 import org.organet.commons.gabriel.Controller.Introducer;
 import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.gabriel.Model.Node;
+import org.organet.commons.inofy.Model.SharedFileHeader;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,11 +37,17 @@ public class MainForm extends JFrame {
   private JList<String> NetworkIndexListBox;
   private JPanel panelMain;
   private JButton downloadButton;
+    private JList keywords;
+    private JButton delete;
+    private JButton addKeyword;
+    private JTextField keywordsTextField;
+    private JButton deleteKeyword;
 
-  private DefaultListModel<String> IpListModel = new DefaultListModel<>();
+    private DefaultListModel<String> IpListModel = new DefaultListModel<>();
   private DefaultListModel<String> ConnectionListModel = new DefaultListModel<>();
   public DefaultListModel<String> LocalIndexListModel = new DefaultListModel<>();
-  private DefaultListModel<String> NetworkIndexListModel = new DefaultListModel<>();
+    private DefaultListModel<String> NetworkIndexListModel = new DefaultListModel<>();
+    public DefaultListModel<String> KeywordsModel = new DefaultListModel<>();
 
   public DefaultListModel<String> getConnectionListModel() {
     return ConnectionListModel;
@@ -55,7 +68,6 @@ public class MainForm extends JFrame {
     IpListModel.setSize(10);
     IpListBox.setModel(IpListModel);
     IpListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//    IpListBox.setMaximumSize(new Dimension(200,700));
     IpListBox.setPreferredSize(new Dimension(10,700));
 
 
@@ -92,7 +104,41 @@ public class MainForm extends JFrame {
     setContentPane(panelMain);
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     pack();
+    keywords.setModel(KeywordsModel);
+      keywords.addMouseListener(new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+              super.mouseClicked(e);
+              String a = (String) keywords.getSelectedValue();
+              System.out.println("keyword " + a+ " clicked");
+              //delete keyword
+          }
+      });
+      LocalIndexListBox.addMouseListener(new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+              super.mouseClicked(e);
+              KeywordsModel.removeAllElements();
+              String name = LocalIndexListBox.getSelectedValue();
+              System.out.println("Shared File " + name + " clicked ");
+              SharedFileHeader sfh = App.localIndex.findIndex(name);
+              App.chosenSharedFileHeader = sfh;
+              sfh.getKeywords().forEach(p-> KeywordsModel.addElement(p.toString()));
 
+          }
+      });
+      deleteKeyword.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+              String keyword = ( String) keywords.getSelectedValue();
+                if(keyword==null) {
+                    JOptionPane.showMessageDialog(null, "Please choose 1 keyword to delete.");
+                    return;
+                }
+              App.chosenSharedFileHeader.getKeywords().remove(keyword);
+              KeywordsModel.removeAllElements();
+          }
+      });
   }
 
   private void downloadButtonActionPerformed(ActionEvent evt) {
@@ -106,7 +152,6 @@ public class MainForm extends JFrame {
   private void getAndListHosts() {
     IpListModel.removeAllElements();
     introducer.checkHostsBruteForce(App.SUBNET);
-    //introducer.getHostCheckerAll().run();
     introducer.getHostCheckerAll().getHostIps().forEach((node) -> IpListModel.addElement(node));
   }
 
@@ -127,4 +172,8 @@ public class MainForm extends JFrame {
       }
     }
   }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
 }

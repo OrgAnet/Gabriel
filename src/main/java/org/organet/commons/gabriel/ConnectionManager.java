@@ -19,8 +19,6 @@ public class ConnectionManager {
   private final static Integer PORT_NO = 5001;
 
   static Index networkIndex = new Index(false);
-  Map<String, Index> remoteIndeces = new HashMap<>(); // TODO Emre will implement this
-  //  connectionId, (de-serialized) remote Index class
 
   public Integer getPORT_NO() {
     return PORT_NO;
@@ -34,11 +32,11 @@ public class ConnectionManager {
       System.out.println("TCPServer Waiting for client on port " + PORT_NO);
       while (true) {
         Socket neighbourConnectionSocket = serverSocket.accept();
-
         Connection newIncomingConnection = new Connection(neighbourConnectionSocket);
 
-            sendIndex(newIncomingConnection, App.localIndex);
-            getRemoteIndex(newIncomingConnection);
+        sendIndex(newIncomingConnection, App.localIndex);
+        getRemoteIndex(newIncomingConnection);
+
         connections.add(newIncomingConnection);
 
         App.mainForm.getConnectionListModel().addElement(newIncomingConnection.getConnectionIp().toString());
@@ -48,7 +46,6 @@ public class ConnectionManager {
       Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
-
 
   public static void sendIndex(Connection connection, Index myIndex) {
     ObjectOutputStream objectOS = null;

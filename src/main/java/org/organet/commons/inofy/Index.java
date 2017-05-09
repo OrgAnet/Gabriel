@@ -157,10 +157,10 @@ public class Index implements Serializable {
     }
   }
 
-  public SharedFileHeader findIndex(String selectedFileScreenName) {
+  public SharedFileHeader findIndex(String selectedFileName) {
     for (SharedFileHeader sh :
             this.getSharedFileHeaders()) {
-      if (sh.getScreenName().equals(selectedFileScreenName))
+      if (sh.getName().equals(selectedFileName))
         return sh;
     }
 

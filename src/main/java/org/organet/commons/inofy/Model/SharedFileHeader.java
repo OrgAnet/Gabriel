@@ -11,20 +11,24 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 // FIXME Do NOT extend File
 public class SharedFileHeader extends File implements Serializable {
   private String ndnid = null; // Named Data Network Identifier
   private String ndntype = null; // Named Data Network File Type
-  private List<String> keywords = new KeywordList<>(); // TODO
-//  private List<String> keywords = new ArrayList<>(); // TODO
   private transient String localPath = null; // Absolute path of the file, MUST be set by Watcher, TODO when not extending the File, rename it to 'path
   private transient long lastModified = -1; // TODO Is this really necessary?
   private String hash = null; // TODO Is this transient or not?
   private String ip;
+
+  private ArrayList<String> keywords = new ArrayList<>();
+
+
   private void initialize() {
     ndntype = FileTypes.getFileType(getExtension());
+    keywords.add("Document");
     try {
       ip = InetAddress.getLocalHost().getHostAddress().toString();
     } catch (UnknownHostException e) {
@@ -127,6 +131,10 @@ public class SharedFileHeader extends File implements Serializable {
 
   // TODO `compareTo()`
 
+
+  public List<String> getKeywords() {
+    return keywords;
+  }
 
   @Override
   public String toString() {
