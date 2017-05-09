@@ -37,8 +37,20 @@ public class ConnectionManager {
 
         Connection newIncomingConnection = new Connection(neighbourConnectionSocket);
 
-        getRemoteIndex(newIncomingConnection);
-        sendIndex(newIncomingConnection, App.localIndex);
+        Runnable r = new Runnable() {
+          @Override
+          public void run() {
+            getRemoteIndex(newIncomingConnection);
+          }
+        };
+        r.run();
+        Runnable r2 = new Runnable() {
+          @Override
+          public void run() {
+            sendIndex(newIncomingConnection, App.localIndex);
+          }
+        };
+        r2.run();
 
         connections.add(newIncomingConnection);
 
@@ -50,59 +62,48 @@ public class ConnectionManager {
     }
   }
 
+
   public static void sendIndex(Connection connection, Index myIndex) {
-    Runnable x = new Runnable() {
-      @Override
-      public void run() {
+    ObjectOutputStream objectOS = null;
+    try {
+      objectOS = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+      objectOS.writeObject(myIndex);
+      objectOS.flush();
 
-        ObjectOutputStream objectOS = null;
-        try {
-          objectOS = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
-          objectOS.writeObject(myIndex);
-          objectOS.flush();
-
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 //        objectOS.close();
 
-      }
-    };
-    x.run();
   }
 
   public static void getRemoteIndex(Connection conn) {
-      Runnable x = new Runnable() {
-        @Override
-        public void run() {
-
-          try {
-          ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(conn.getInputStream()));
-          Index remoteIndex = new Index(false);
-          boolean flag = true;
-          while (flag) {
-            try {
-              remoteIndex = (Index) in.readObject();
-              flag = false;
-            } catch (EOFException ex) {
-              flag = true;
-            }
-          }
-          System.out.println("Index read successfully: " + remoteIndex.toString());
-          conn.setConnectionIndex(remoteIndex);
-          networkIndex.addAllSharedFiles(remoteIndex);
-          for (SharedFileHeader sh : networkIndex.getSharedFileHeaders()) {
-            conn.getConnectionIndex().add(sh);
-          }
-        } catch (IOException e) {
-          e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-          e.printStackTrace();
+    try {
+      ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(conn.getInputStream()));
+      Index remoteIndex = new Index(false);
+      boolean flag = true;
+      while (flag) {
+        try {
+          remoteIndex = (Index) in.readObject();
+          flag = false;
+        } catch (EOFException ex) {
+          flag = true;
         }
-        }
-      };
-      x.run();
+      }
+      System.out.println("Index read successfully: " + remoteIndex.toString());
+      conn.setConnectionIndex(remoteIndex);
+      networkIndex.addAllSharedFiles(remoteIndex);
+      for (SharedFileHeader sh : networkIndex.getSharedFileHeaders()) {
+        conn.getConnectionIndex().add(sh);
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+    }
   }
+
+
 
   public static void broadcastLocalIndex() {
     //TODO send local index to all connections
@@ -123,9 +124,9 @@ public class ConnectionManager {
 
       newConnection = new Connection(new Socket(connectionIp.getHostAddress(), PORT_NO));
 
-      getRemoteIndex(newConnection);
-
       sendIndex(newConnection, App.localIndex);
+
+      getRemoteIndex(newConnection);
 
       connections.add(newConnection);
       App.mainForm.getConnectionListModel().addElement(newConnection.getConnectionIp().toString());
