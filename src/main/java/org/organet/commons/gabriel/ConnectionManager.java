@@ -123,9 +123,9 @@ public class ConnectionManager {
 
       newConnection = new Connection(new Socket(connectionIp.getHostAddress(), PORT_NO));
 
-      sendIndex(newConnection, App.localIndex);
-
       getRemoteIndex(newConnection);
+
+      sendIndex(newConnection, App.localIndex);
 
       connections.add(newConnection);
       App.mainForm.getConnectionListModel().addElement(newConnection.getConnectionIp().toString());
