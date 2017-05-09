@@ -45,7 +45,6 @@ public class Introducer implements Runnable {
           System.out.println("Error on Introducer.getConnections()!");
         }
       });
-
       System.out.println(hostCheckerAll.getHostIps());
     } catch (Exception ex) {
       Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);

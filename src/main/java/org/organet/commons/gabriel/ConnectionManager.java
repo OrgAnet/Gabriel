@@ -109,11 +109,27 @@ public class ConnectionManager {
 
       sendIndex(newConnection, App.localIndex);
       connections.add(newConnection);
+      App.mainForm.getConnectionListModel().addElement(newConnection.getConnectionIp().toString());
       return newConnection;
     } catch (IOException e) {
       e.printStackTrace();
       System.out.println("Couldn't create connection");
       return null;
     }
+  }
+
+  public static void downloadFile() {
+    String selectedFileScreenName = App.mainForm.getNetworkIndexListBox().getSelectedValue();
+
+    if(selectedFileScreenName == null){
+      System.out.println("Error file not specified");
+      return ;
+    }
+
+    SharedFile networkSharedFile = networkIndex.findIndex(selectedFileScreenName);
+
+    System.out.println(networkSharedFile.toString());
+
+
   }
 }

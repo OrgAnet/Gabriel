@@ -153,4 +153,15 @@ public class Index implements Serializable {
     }
   }
 
+  public SharedFile findIndex(String selectedFileScreenName) {
+    for (SharedFile sh :
+            this.getSharedFiles()) {
+      if (sh.getScreenName().equals(selectedFileScreenName))
+        return sh;
+    }
+
+    System.out.println("SharedFile couldn't find on networkIndex");
+    return null;
+  }
+
 }

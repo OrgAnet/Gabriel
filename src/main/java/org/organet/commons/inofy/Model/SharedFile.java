@@ -121,4 +121,18 @@ public class SharedFile extends File implements Serializable {
   }
 
   // TODO `compareTo()`
+
+
+  @Override
+  public String toString() {
+    return "SharedFile{" +
+            "ndnid='" + ndnid + '\'' +
+            ", ndntype='" + ndntype + '\'' +
+            ", keywords=" + keywords +
+            ", localPath='" + localPath + '\'' +
+            ", lastModified=" + lastModified +
+            ", hash='" + hash + '\'' +
+            ", size=" + size +
+            '}';
+  }
 }

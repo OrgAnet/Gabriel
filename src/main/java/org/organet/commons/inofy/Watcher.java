@@ -133,8 +133,9 @@ public class Watcher implements Runnable {
 
           if (kind == ENTRY_CREATE) {
             // Create a shared file and add to the local index
-            App.localIndex.add(new SharedFile(child.toString()));
-
+            SharedFile sh = new SharedFile(child.toString());
+            App.localIndex.add(sh);
+            System.out.println("new Shared File: " + sh.toString());
             // FIXME Implement this behaviour in another way (i.e. anywhere else) \
             // filename MUST stay as it is, it is not the problem here
             App.mainForm.LocalIndexListModel.addElement(filename.toString());

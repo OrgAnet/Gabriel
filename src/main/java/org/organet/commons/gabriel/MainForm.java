@@ -8,6 +8,7 @@ import org.organet.commons.inofy.Model.SharedFile;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
@@ -23,8 +24,18 @@ public class MainForm extends JFrame {
   private JList<String> ConnectionListBox;
   private JButton listenConnection;
   private JList<String> LocalIndexListBox;
+
+  public JList<String> getNetworkIndexListBox() {
+    return NetworkIndexListBox;
+  }
+
+  public void setNetworkIndexListBox(JList<String> networkIndexListBox) {
+    NetworkIndexListBox = networkIndexListBox;
+  }
+
   private JList<String> NetworkIndexListBox;
   private JPanel panelMain;
+  private JButton downloadButton;
 
   private DefaultListModel<String> IpListModel = new DefaultListModel<>();
   private DefaultListModel<String> ConnectionListModel = new DefaultListModel<>();
@@ -47,9 +58,18 @@ public class MainForm extends JFrame {
   private Introducer introducer;
 
   MainForm() {
-    IpListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-    IpListBox.setLayoutOrientation(JList.VERTICAL);
+    IpListModel.setSize(10);
     IpListBox.setModel(IpListModel);
+    IpListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//    IpListBox.setMaximumSize(new Dimension(200,700));
+    IpListBox.setPreferredSize(new Dimension(10,700));
+
+
+   IpListBox.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+    IpListBox.setVisibleRowCount(10);
+
+    IpListBox.revalidate();
+    IpListBox.repaint();
 
     ConnectionListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     ConnectionListBox.setLayoutOrientation(JList.VERTICAL);
@@ -65,13 +85,24 @@ public class MainForm extends JFrame {
 
     ScanNetworkButton.addActionListener(this::ScanNetworkButtonActionPerformed);
     ConnectButton.addActionListener(this::ConnectButtonActionPerformed);
+    downloadButton.addActionListener(this::downloadButtonActionPerformed);
+
 
     introducer = App.getIntroducer();
-    introducer.checkHostsBruteForce(App.SUBNET);
 
+    panelMain.setPreferredSize(new Dimension(900, 650));
+    panelMain.repaint();
+    revalidate();
+
+    getAndListHosts();
     setContentPane(panelMain);
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     pack();
+
+  }
+
+  private void downloadButtonActionPerformed(ActionEvent evt) {
+      ConnectionManager.downloadFile();
   }
 
   private void ScanNetworkButtonActionPerformed(ActionEvent evt) {
@@ -80,7 +111,8 @@ public class MainForm extends JFrame {
 
   private void getAndListHosts() {
     IpListModel.removeAllElements();
-    introducer.getHostCheckerAll().run();
+    introducer.checkHostsBruteForce(App.SUBNET);
+    //introducer.getHostCheckerAll().run();
     introducer.getHostCheckerAll().getHostIps().forEach((node) -> IpListModel.addElement(node));
   }
 
@@ -95,12 +127,6 @@ public class MainForm extends JFrame {
         String ip = selectedIp.split(" -")[0].replaceAll("/", "");
         Node selectedNode = App.getNode(ip);
         Connection newConnection = ConnectionManager.createConnection(selectedNode.getConnectionIp());
-        if(newConnection!=null) {
-          ConnectionListModel.addElement(newConnection.getConnectionIp().toString());
-          for (SharedFile sh : newConnection.getConnectionIndex().getSharedFiles()) {
-            getNetworkIndexListModel().addElement(sh.getScreenName());
-          }
-        }
 
       } catch (HeadlessException ex) {
         Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);

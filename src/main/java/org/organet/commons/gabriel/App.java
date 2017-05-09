@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 public class App {
   final static int RANDOM_PORT = 5000;
-  final static String SUBNET = "192.168.1";
+  final static String SUBNET = "10.253.127";
 
   public static Index localIndex = null;
 
@@ -60,7 +60,7 @@ public class App {
       paths.forEach(filePath -> {
         if (Files.isRegularFile(filePath)) {
           // FIXME Implement this behaviour in another way (i.e. anywhere else)
-          App.mainForm.LocalIndexListModel.addElement(filePath.toFile().getName());
+            App.mainForm.LocalIndexListModel.addElement(filePath.toFile().getName());
             SharedFile sh = new SharedFile(filePath.toFile().getName());
             localIndex.add(sh);
         }
@@ -74,6 +74,7 @@ public class App {
     // Watch the shared directory directory recursively for changes
 
       App.startWatcherExecutor( sharedDir);
+
       App.startServerExecutor();
 
   }
