@@ -10,9 +10,11 @@ import java.util.List;
 // TODO `implements Serializable` or `.serialize()`
 public class Index implements Serializable {
   private ArrayList<SharedFile> sharedFiles;
+  private boolean isLocal;
 
-  public Index() {
+  public Index(boolean isLocal) {
     sharedFiles = new ArrayList<>();
+    this.isLocal = isLocal;
   }
 
   public ArrayList<SharedFile> getSharedFiles() {
@@ -39,19 +41,19 @@ public class Index implements Serializable {
 
   public boolean add(SharedFile sharedFile) {
     return sharedFiles.add(sharedFile);
-    // TODO Invoke the necessary method to propagate the updated index
+    // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
   public boolean remove(SharedFile sharedFile) {
     return sharedFiles.remove(sharedFile);
-    // TODO Invoke the necessary method to propagate the updated index
+    // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
   public void clear() {
     sharedFiles.clear();
-    // TODO Invoke the necessary method to propagate the updated index
+    // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
@@ -82,7 +84,7 @@ public class Index implements Serializable {
     }
 
     return itemToBeRemoved;
-    // TODO Invoke the necessary method to propagate the updated index
+    // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
@@ -99,7 +101,7 @@ public class Index implements Serializable {
     }
 
     return itemToBeRemoved;
-    // TODO Invoke the necessary method to propagate the updated index
+    // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
@@ -124,7 +126,7 @@ public class Index implements Serializable {
       // doesn't exist - add the given shared file
       return add(sharedFile);
     }
-    // TODO Invoke the necessary method to propagate the updated index
+    // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 

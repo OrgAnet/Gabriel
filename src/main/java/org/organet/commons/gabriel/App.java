@@ -53,7 +53,7 @@ public class App {
 
     String sharedDirPath = args[0];
     File sharedDir = new File(sharedDirPath);
-    localIndex = new Index();
+    localIndex = new Index(true);
 
     // Walk shared directory for initial indexing
     try(Stream<Path> paths = Files.walk(Paths.get(sharedDirPath))) {
