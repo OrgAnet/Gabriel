@@ -33,11 +33,9 @@ public class ConnectionManager {
       ServerSocket serverSocket = new ServerSocket(PORT_NO);
       System.out.println("TCPServer Waiting for client on port "+PORT_NO);
       while (true) {
-        Socket connectionSocket = serverSocket.accept();
+        Socket neighbourConnectionSocket = serverSocket.accept();
 
-        Connection newIncomingConnection = new Connection(connectionSocket);
-
-        getRemoteIndex(newIncomingConnection);
+        Connection newIncomingConnection = new Connection(neighbourConnectionSocket);
 
         connections.add(newIncomingConnection);
 
@@ -79,7 +77,6 @@ public class ConnectionManager {
         networkIndex.addAllSharedFiles(remoteIndex);
         for (SharedFileHeader sh :networkIndex.getSharedFileHeaders()) {
             conn.getConnectionIndex().add(sh);
-            App.mainForm.getNetworkIndexListModel().addElement(sh.getScreenName());
         }
     } catch (IOException e) {
       e.printStackTrace();
@@ -107,6 +104,8 @@ public class ConnectionManager {
 
       newConnection = new Connection(new Socket(connectionIp.getHostAddress(),PORT_NO) );
 
+      getRemoteIndex(newConnection);
+
       sendIndex(newConnection, App.localIndex);
       connections.add(newConnection);
       App.mainForm.getConnectionListModel().addElement(newConnection.getConnectionIp().toString());
@@ -129,6 +128,8 @@ public class ConnectionManager {
     SharedFileHeader networkSharedFileHeader = networkIndex.findIndex(selectedFileScreenName);
 
     System.out.println(networkSharedFileHeader.toString());
+
+    connections.get(0).requestFile(networkSharedFileHeader.getNDNID());
 
 
   }

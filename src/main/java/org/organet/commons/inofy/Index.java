@@ -1,5 +1,6 @@
 package org.organet.commons.inofy;
 
+import org.organet.commons.gabriel.App;
 import org.organet.commons.inofy.Model.SharedFileHeader;
 
 import java.io.Serializable;
@@ -152,6 +153,7 @@ public class Index implements Serializable {
   public void addAllSharedFiles(Index newIndex){
     for (int i=0;i<newIndex.size();i++){
       this.add(newIndex.get(i));
+      App.mainForm.getNetworkIndexListModel().addElement(newIndex.get(i).getScreenName());
     }
   }
 
