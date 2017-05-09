@@ -26,23 +26,23 @@ public class ConnectionManager {
     return PORT_NO;
   }
 
-  public static void  startServer(){
+  public static void startServer() {
     try {
       //Listening for a connection to be made
-        System.out.println("server started");
+      System.out.println("server started");
       ServerSocket serverSocket = new ServerSocket(PORT_NO);
-      System.out.println("TCPServer Waiting for client on port "+PORT_NO);
+      System.out.println("TCPServer Waiting for client on port " + PORT_NO);
       while (true) {
         Socket neighbourConnectionSocket = serverSocket.accept();
 
         Connection newIncomingConnection = new Connection(neighbourConnectionSocket);
 
         getRemoteIndex(newIncomingConnection);
-        sendIndex(newIncomingConnection,App.localIndex);
+        sendIndex(newIncomingConnection, App.localIndex);
 
         connections.add(newIncomingConnection);
 
-       // App.mainForm.getConnectionListModel().addElement(newIncomingConnection.getConnectionIp().toString());
+        App.mainForm.getConnectionListModel().addElement(newIncomingConnection.getConnectionIp().toString());
       }
     } catch (IOException ex) {
       System.out.println("Input Output Exception on Listen Connection Action Performed");
@@ -51,44 +51,57 @@ public class ConnectionManager {
   }
 
   public static void sendIndex(Connection connection, Index myIndex) {
+    Runnable x = new Runnable() {
+      @Override
+      public void run() {
 
-    ObjectOutputStream objectOS = null;
-    try {
-      objectOS = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
-      objectOS.writeObject(myIndex);
-      objectOS.flush();
+        ObjectOutputStream objectOS = null;
+        try {
+          objectOS = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+          objectOS.writeObject(myIndex);
+          objectOS.flush();
 
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
 //        objectOS.close();
 
+      }
+    };
+    x.run();
   }
 
   public static void getRemoteIndex(Connection conn) {
-    try {
-      ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(conn.getInputStream()));
-      Index remoteIndex=new Index(false);
-      boolean flag = true;
-      while(flag){
-          try{
+      Runnable x = new Runnable() {
+        @Override
+        public void run() {
+
+          try {
+          ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(conn.getInputStream()));
+          Index remoteIndex = new Index(false);
+          boolean flag = true;
+          while (flag) {
+            try {
               remoteIndex = (Index) in.readObject();
               flag = false;
-          }catch(EOFException ex){
-              flag=true;
+            } catch (EOFException ex) {
+              flag = true;
+            }
           }
-      }
-        System.out.println("Index read successfully: " + remoteIndex.toString());
-        conn.setConnectionIndex(remoteIndex);
-        networkIndex.addAllSharedFiles(remoteIndex);
-        for (SharedFileHeader sh :networkIndex.getSharedFileHeaders()) {
+          System.out.println("Index read successfully: " + remoteIndex.toString());
+          conn.setConnectionIndex(remoteIndex);
+          networkIndex.addAllSharedFiles(remoteIndex);
+          for (SharedFileHeader sh : networkIndex.getSharedFileHeaders()) {
             conn.getConnectionIndex().add(sh);
+          }
+        } catch (IOException e) {
+          e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+          e.printStackTrace();
         }
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
-        e.printStackTrace();
-    }
+        }
+      };
+      x.run();
   }
 
   public static void broadcastLocalIndex() {
@@ -108,11 +121,11 @@ public class ConnectionManager {
     Connection newConnection = null;
     try {
 
-      newConnection = new Connection(new Socket(connectionIp.getHostAddress(),PORT_NO) );
-
-      sendIndex(newConnection, App.localIndex);
+      newConnection = new Connection(new Socket(connectionIp.getHostAddress(), PORT_NO));
 
       getRemoteIndex(newConnection);
+
+      sendIndex(newConnection, App.localIndex);
 
       connections.add(newConnection);
       App.mainForm.getConnectionListModel().addElement(newConnection.getConnectionIp().toString());
@@ -127,9 +140,9 @@ public class ConnectionManager {
   public static void downloadFile() {
     String selectedFileScreenName = App.mainForm.getNetworkIndexListBox().getSelectedValue();
 
-    if(selectedFileScreenName == null){
+    if (selectedFileScreenName == null) {
       System.out.println("Error file not specified");
-      return ;
+      return;
     }
 
     SharedFileHeader networkSharedFileHeader = networkIndex.findIndex(selectedFileScreenName);
