@@ -119,14 +119,24 @@ public class ConnectionManager {
   }
 
   public static Connection createConnection(Inet4Address connectionIp) {
-    Connection newConnection = null;
     try {
 
-      newConnection = new Connection(new Socket(connectionIp.getHostAddress(), PORT_NO));
+      final Connection newConnection = new Connection(new Socket(connectionIp.getHostAddress(), PORT_NO));
 
-      sendIndex(newConnection, App.localIndex);
-
-      getRemoteIndex(newConnection);
+      Runnable r = new Runnable() {
+        @Override
+        public void run() {
+          getRemoteIndex(newConnection);
+        }
+      };
+      r.run();
+      Runnable r2 = new Runnable() {
+        @Override
+        public void run() {
+          sendIndex(newConnection, App.localIndex);
+        }
+      };
+      r2.run();
 
       connections.add(newConnection);
       App.mainForm.getConnectionListModel().addElement(newConnection.getConnectionIp().toString());
