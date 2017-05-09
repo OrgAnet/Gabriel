@@ -61,7 +61,7 @@ public class App {
         if (Files.isRegularFile(filePath)) {
           // FIXME Implement this behaviour in another way (i.e. anywhere else)
             App.mainForm.LocalIndexListModel.addElement(filePath.toFile().getName());
-            SharedFile sh = new SharedFile(filePath.toFile().getName());
+            SharedFile sh = SharedFile.fromFile(filePath.toFile());
             localIndex.add(sh);
         }
       });

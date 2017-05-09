@@ -18,7 +18,7 @@ public class ConnectionManager {
   private static ArrayList<Connection> connections = new ArrayList<>();
   private final static Integer PORT_NO = 5000;
 
-  static Index networkIndex = new Index();
+  static Index networkIndex = new Index(false);
   Map<String, Index> remoteIndeces = new HashMap<>(); // TODO Emre will implement this
   //  connectionId, (de-serialized) remote Index class
 
@@ -64,7 +64,7 @@ public class ConnectionManager {
   public static void getRemoteIndex(Connection conn) {
     try {
       ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(conn.getConnectionSocket().getInputStream()));
-      Index remoteIndex=new Index();
+      Index remoteIndex=new Index(false);
       boolean flag = true;
       while(flag){
           try{

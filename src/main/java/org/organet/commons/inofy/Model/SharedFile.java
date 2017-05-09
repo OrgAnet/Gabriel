@@ -21,7 +21,6 @@ public class SharedFile extends File implements Serializable {
   private transient String localPath = null; // Absolute path of the file, MUST be set by Watcher, TODO when not extending the File, rename it to 'path
   private transient long lastModified = -1; // TODO Is this really necessary?
   private String hash = null; // TODO Is this transient or not?
-  private long size = -1;
 
   private void initialize() {
     ndntype = FileTypes.getFileType(getExtension());
@@ -131,8 +130,8 @@ public class SharedFile extends File implements Serializable {
             ", keywords=" + keywords +
             ", localPath='" + localPath + '\'' +
             ", lastModified=" + lastModified +
-            ", hash='" + hash + '\'' +
-            ", size=" + size +
+            ", hash='" + getHash() + '\'' +
+            ", size=" + getSize() +
             '}';
   }
 }
