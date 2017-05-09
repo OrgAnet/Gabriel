@@ -37,6 +37,9 @@ public class ConnectionManager {
 
         Connection newIncomingConnection = new Connection(neighbourConnectionSocket);
 
+        getRemoteIndex(newIncomingConnection);
+        sendIndex(newIncomingConnection,App.localIndex);
+
         connections.add(newIncomingConnection);
 
        // App.mainForm.getConnectionListModel().addElement(newIncomingConnection.getConnectionIp().toString());
@@ -104,9 +107,10 @@ public class ConnectionManager {
 
       newConnection = new Connection(new Socket(connectionIp.getHostAddress(),PORT_NO) );
 
+      sendIndex(newConnection, App.localIndex);
+
       getRemoteIndex(newConnection);
 
-      sendIndex(newConnection, App.localIndex);
       connections.add(newConnection);
       App.mainForm.getConnectionListModel().addElement(newConnection.getConnectionIp().toString());
       return newConnection;
@@ -129,7 +133,7 @@ public class ConnectionManager {
 
     System.out.println(networkSharedFileHeader.toString());
 
-    connections.get(0).requestFile(networkSharedFileHeader.getNDNID());
+    connections.get(1).requestFile(networkSharedFileHeader.getNDNID());
 
 
   }
