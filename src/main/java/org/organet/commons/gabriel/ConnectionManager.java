@@ -37,21 +37,8 @@ public class ConnectionManager {
 
         Connection newIncomingConnection = new Connection(neighbourConnectionSocket);
 
-        Runnable r = new Runnable() {
-          @Override
-          public void run() {
-            getRemoteIndex(newIncomingConnection);
-          }
-        };
-        r.run();
-        Runnable r2 = new Runnable() {
-          @Override
-          public void run() {
             sendIndex(newIncomingConnection, App.localIndex);
-          }
-        };
-        r2.run();
-
+            getRemoteIndex(newIncomingConnection);
         connections.add(newIncomingConnection);
 
         App.mainForm.getConnectionListModel().addElement(newIncomingConnection.getConnectionIp().toString());
@@ -73,8 +60,6 @@ public class ConnectionManager {
     } catch (IOException e) {
       e.printStackTrace();
     }
-//        objectOS.close();
-
   }
 
   public static void getRemoteIndex(Connection conn) {
@@ -103,8 +88,6 @@ public class ConnectionManager {
     }
   }
 
-
-
   public static void broadcastLocalIndex() {
     //TODO send local index to all connections
   }
@@ -123,20 +106,8 @@ public class ConnectionManager {
 
       final Connection newConnection = new Connection(new Socket(connectionIp.getHostAddress(), PORT_NO));
 
-      Runnable r = new Runnable() {
-        @Override
-        public void run() {
           getRemoteIndex(newConnection);
-        }
-      };
-      r.run();
-      Runnable r2 = new Runnable() {
-        @Override
-        public void run() {
           sendIndex(newConnection, App.localIndex);
-        }
-      };
-      r2.run();
 
       connections.add(newConnection);
       App.mainForm.getConnectionListModel().addElement(newConnection.getConnectionIp().toString());

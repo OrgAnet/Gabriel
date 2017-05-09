@@ -7,6 +7,8 @@ import org.organet.commons.inofy.KeywordList;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.net.URI;
 import java.util.List;
@@ -20,9 +22,14 @@ public class SharedFileHeader extends File implements Serializable {
   private transient String localPath = null; // Absolute path of the file, MUST be set by Watcher, TODO when not extending the File, rename it to 'path
   private transient long lastModified = -1; // TODO Is this really necessary?
   private String hash = null; // TODO Is this transient or not?
-
+  private String ip;
   private void initialize() {
     ndntype = FileTypes.getFileType(getExtension());
+    try {
+      ip = InetAddress.getLocalHost().getHostAddress().toString();
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
     hash = getHash();
   }
 
@@ -115,7 +122,7 @@ public class SharedFileHeader extends File implements Serializable {
   }
 
   public String getScreenName(){
-    return getName();
+    return getName() +" - "+ ip;
   }
 
   // TODO `compareTo()`
@@ -124,6 +131,7 @@ public class SharedFileHeader extends File implements Serializable {
   @Override
   public String toString() {
     return "SharedFileHeader{" +
+            "ip='" +ip+"\'"+
             "ndnid='" + ndnid + '\'' +
             ", ndntype='" + ndntype + '\'' +
             ", keywords=" + keywords +
