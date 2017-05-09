@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -126,5 +128,37 @@ public class App {
 
   public static int getPossibleHostsCount() {
     return possibleHostsCount;
+  }
+
+  private static String calculateDeviceID() {
+    // Start with MAC address of the ad-hoc network interface
+    String idBase = Helper.getMACAddress();
+
+    // Remove dashes
+    idBase = idBase.replace("-", "");
+
+    // Arbitrarily shuffle the ID
+    int idBaseLen = idBase.length();
+    char[] characters = idBase.toCharArray();
+
+    // Generate and fill the `charactersOrder` with random numbers
+    // NOTE Hard-coded order guarantees that every time same device identifier \
+    //      is going to be calculated for the same MAC address.
+    List<Integer> charactersOrder = new ArrayList<>(Arrays.asList(10, 1, 5, 8, 0, 2, 6, 4, 7, 11, 3, 9));
+
+    // Finally construct the device identifier by appending it with characters
+    StringBuilder idBuilder = new StringBuilder(idBaseLen);
+    for (int i = 0; i < idBaseLen; i++) {
+      // Try to convert odd numbers to characters in ASCII table if adding 5 (53 in ASCII)
+      // will not make them greater than 'f' so this way the device identifier might look
+      // more like a random hexadecimal number rather than MAC address-based number.
+      if (i % 2 != 0 || ((int) (characters[charactersOrder.get(i)]) - 48) > 5) {
+        idBuilder.append(characters[charactersOrder.get(i)]);
+      } else {
+        idBuilder.append((char) (((int) (characters[charactersOrder.get(i)]) - 48) + 'a'));
+      }
+    }
+
+    return idBuilder.toString();
   }
 }
