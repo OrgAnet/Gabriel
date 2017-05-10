@@ -18,6 +18,14 @@ public class ConnectionManager {
   private static ArrayList<Connection> connections = new ArrayList<>();
   private final static Integer PORT_NO = 5001;
 
+  public static ArrayList<Connection> getConnections() {
+    return connections;
+  }
+
+  public static void setConnections(ArrayList<Connection> connections) {
+    ConnectionManager.connections = connections;
+  }
+
   static Index networkIndex = new Index(false);
 
   public Integer getPORT_NO() {

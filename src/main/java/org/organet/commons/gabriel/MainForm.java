@@ -3,7 +3,9 @@ package org.organet.commons.gabriel;
 import org.organet.commons.gabriel.Controller.Introducer;
 import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.gabriel.Model.Node;
+import org.organet.commons.inofy.Index;
 import org.organet.commons.inofy.Model.SharedFileHeader;
+import sun.security.provider.SHA;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
@@ -14,6 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,6 +46,9 @@ public class MainForm extends JFrame {
     private JTextField keywordsTextField;
     private JButton deleteKeyword;
     private JTextArea fileHeaderInfo;
+    private JTextField searchText;
+    private JButton clearFilterButton;
+    private JButton filterButton;
 
     private DefaultListModel<String> IpListModel = new DefaultListModel<>();
   private DefaultListModel<String> ConnectionListModel = new DefaultListModel<>();
@@ -126,11 +132,6 @@ public class MainForm extends JFrame {
 
           }
 
-          private void fillFileHeader(SharedFileHeader sfh) {
-              fileHeaderInfo.setText(sfh.getName() + "\nKeywords: " + sfh.getKeywords() );
-              fileHeaderInfo.append("\nNamed Data Networking ID:" + sfh.getNDNID());
-              fileHeaderInfo.append("\nIP: " + sfh.getIp());
-          }
       });
       deleteKeyword.addActionListener(new ActionListener() {
           @Override
@@ -158,7 +159,7 @@ public class MainForm extends JFrame {
               App.chosenSharedFileHeader.getKeywords().add(keywordsTextField.getText());
               KeywordsModel.addElement(keywordsTextField.getText());
               keywordsTextField.setText("");
-
+              fillFileHeader(App.chosenSharedFileHeader );
           }
       });
 
@@ -167,17 +168,50 @@ public class MainForm extends JFrame {
       setContentPane(panelMain);
       setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
       pack();
+
+
+      filterButton.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+                ArrayList<SharedFileHeader> found = (ArrayList) ConnectionManager.networkIndex.search(searchText.getText());
+                NetworkIndexListModel.removeAllElements();
+                found.forEach(p->NetworkIndexListModel.addElement(p.getScreenName()));
+          }
+      });
+      clearFilterButton.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+              NetworkIndexListModel.removeAllElements();
+              ConnectionManager.networkIndex.getSharedFileHeaders().forEach(P->NetworkIndexListModel.addElement(P.getScreenName()));
+              searchText.setText("");
+          }
+      });
   }
 
+    private void fillFileHeader(SharedFileHeader sfh) {
+        fileHeaderInfo.setText(sfh.getName() + "\nKeywords:" );
+        sfh.getKeywords().forEach(p->fileHeaderInfo.append("["+p+"]\n"));
+        fileHeaderInfo.append("Named Data Networking ID:" + sfh.getNDNID());
+        fileHeaderInfo.append("\nIP: " + sfh.getIp());
+    }
   private void downloadButtonActionPerformed(ActionEvent evt) {
       ConnectionManager.downloadFile();
   }
 
   private void ScanNetworkButtonActionPerformed(ActionEvent evt) {
+      clearScreen();
+
     getAndListHosts();
   }
 
-  private void getAndListHosts() {
+    private void clearScreen() {
+
+        searchText.setText("");
+        keywordsTextField.setText("");
+        keywords.removeAll();
+    }
+
+    private void getAndListHosts() {
     IpListModel.removeAllElements();
     introducer.checkHostsBruteForce(App.SUBNET);
     introducer.getHostCheckerAll().getHostIps().forEach((node) -> IpListModel.addElement(node));

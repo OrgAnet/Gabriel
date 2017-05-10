@@ -18,6 +18,8 @@ public class Index implements Serializable {
     this.isLocal = isLocal;
   }
 
+
+
   public ArrayList<SharedFileHeader> getSharedFileHeaders() {
     return sharedFileHeaders;
   }
@@ -133,10 +135,13 @@ public class Index implements Serializable {
 
   public List<SharedFileHeader> search(String keyword) {
     List<SharedFileHeader> foundSharedFileHeaders = new ArrayList<>();
+    keyword=keyword.toLowerCase();
 
     for (SharedFileHeader sharedFileHeader : sharedFileHeaders) {
-      if (sharedFileHeader.hasKeyword(keyword)) {
-        foundSharedFileHeaders.add(sharedFileHeader);
+
+      for (String key : sharedFileHeader.getKeywords()) {
+        if(key.toLowerCase().contains(keyword))
+          foundSharedFileHeaders.add(sharedFileHeader);
       }
     }
 
