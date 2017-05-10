@@ -140,8 +140,10 @@ public class Index implements Serializable {
     for (SharedFileHeader sharedFileHeader : sharedFileHeaders) {
 
       for (String key : sharedFileHeader.getKeywords()) {
-        if(key.toLowerCase().contains(keyword))
+        if(key.toLowerCase().contains(keyword)) {
           foundSharedFileHeaders.add(sharedFileHeader);
+          break;
+        }
       }
     }
 

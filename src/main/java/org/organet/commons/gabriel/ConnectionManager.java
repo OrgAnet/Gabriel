@@ -126,7 +126,8 @@ public class ConnectionManager {
 
   public static void downloadFile() {
     String selectedFileScreenName = App.mainForm.getNetworkIndexListBox().getSelectedValue();
-
+    selectedFileScreenName = selectedFileScreenName.split(" - ")[0];
+    System.out.println("chosen file to download: "+ selectedFileScreenName);
     if (selectedFileScreenName == null) {
       System.out.println("Error file not specified");
       return;
