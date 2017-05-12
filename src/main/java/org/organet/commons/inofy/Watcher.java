@@ -75,6 +75,7 @@ public class Watcher implements Runnable {
    */
   @Override
   public void run() {
+    int i=0;
     for (;;) {
       // wait for key to be signalled
       WatchKey key;
@@ -100,7 +101,7 @@ public class Watcher implements Runnable {
           continue;
         }
 
-        // Context for directory entry event is the file name of entry
+        // Context for directory entry event is the file fileName of entry
         WatchEvent<Path> ev = cast(event);
         Path filename = ev.context();
         Path child = dir.resolve(filename);

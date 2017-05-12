@@ -48,6 +48,13 @@ public class ConnectionManager {
         connections.add(newIncomingConnection);
 
         App.mainForm.getConnectionListModel().addElement(newIncomingConnection.getConnectionIp().toString());
+
+
+
+        new Thread(newIncomingConnection.getListenCommands()).start();
+
+        System.out.println("started listening");
+
       }
     } catch (IOException ex) {
       System.out.println("Input Output Exception on Listen Connection Action Performed");
@@ -58,10 +65,9 @@ public class ConnectionManager {
   public static void sendIndex(Connection connection, Index myIndex) {
     ObjectOutputStream objectOS = null;
     try {
-      objectOS = new ObjectOutputStream(new BufferedOutputStream(connection.getOutputStream()));
+      objectOS = new ObjectOutputStream(new BufferedOutputStream(connection.getConnectionSocket().getOutputStream()));
       objectOS.writeObject(myIndex);
       objectOS.flush();
-
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -69,7 +75,7 @@ public class ConnectionManager {
 
   public static void getRemoteIndex(Connection conn) {
     try {
-      ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(conn.getInputStream()));
+      ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(conn.getConnectionSocket().getInputStream()));
       Index remoteIndex = new Index(false);
       boolean flag = true;
       while (flag) {
@@ -111,11 +117,16 @@ public class ConnectionManager {
 
       final Connection newConnection = new Connection(new Socket(connectionIp.getHostAddress(), PORT_NO));
 
-          getRemoteIndex(newConnection);
-          sendIndex(newConnection, App.localIndex);
+      getRemoteIndex(newConnection);
+      sendIndex(newConnection, App.localIndex);
 
       connections.add(newConnection);
       App.mainForm.getConnectionListModel().addElement(newConnection.getConnectionIp().toString());
+
+      new Thread(newConnection.getListenCommands()).start();
+
+      System.out.println("started listening");
+
       return newConnection;
     } catch (IOException e) {
       e.printStackTrace();
@@ -125,20 +136,15 @@ public class ConnectionManager {
   }
 
   public static void downloadFile() {
-    String selectedFileScreenName = App.mainForm.getNetworkIndexListBox().getSelectedValue();
-    selectedFileScreenName = selectedFileScreenName.split(" - ")[0];
-    System.out.println("chosen file to download: "+ selectedFileScreenName);
-    if (selectedFileScreenName == null) {
+    String selectedString = App.mainForm.getNetworkIndexListBox().getSelectedValue();
+    Integer selectedNDNid = Integer.parseInt(selectedString.split(" - ")[0]);
+
+    System.out.println("chosen file to download: "+ selectedNDNid);
+    if (selectedNDNid == null) {
       System.out.println("Error file not specified");
       return;
     }
 
-    SharedFileHeader networkSharedFileHeader = networkIndex.findIndex(selectedFileScreenName);
-
-    System.out.println(networkSharedFileHeader.toString());
-
-    //connections.get(0).requestFile(networkSharedFileHeader.getNDNID());
-
-
+    connections.get(0).requestFile(selectedNDNid);   //first find IP to decide who to ask.
   }
 }

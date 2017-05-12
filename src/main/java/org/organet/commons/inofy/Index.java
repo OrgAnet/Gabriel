@@ -12,7 +12,7 @@ import java.util.List;
 public class Index implements Serializable {
   private ArrayList<SharedFileHeader> sharedFileHeaders;
   private boolean isLocal;
-
+  Integer ndncount = 0;
   public Index(boolean isLocal) {
     sharedFileHeaders = new ArrayList<>();
     this.isLocal = isLocal;
@@ -43,6 +43,7 @@ public class Index implements Serializable {
   // (e.g. `.contains(SharedFileHeader ...)` or `.contains(File ...`)
 
   public boolean add(SharedFileHeader sharedFileHeader) {
+    sharedFileHeader.setNDNid(getNDNcount());
     return sharedFileHeaders.add(sharedFileHeader);
     // TODO Invoke the necessary method to propagate the updated index (if the index is local)
     // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
@@ -167,12 +168,35 @@ public class Index implements Serializable {
   public SharedFileHeader findIndex(String selectedFileName) {
     for (SharedFileHeader sh :
             this.getSharedFileHeaders()) {
-      if (sh.getName().equals(selectedFileName))
+      String sharedFileName = sh.getFileName();
+      System.out.println("COMPARING: '" + sharedFileName + "' vs '" + selectedFileName +"'");
+      if (sharedFileName == selectedFileName || selectedFileName.equals(sharedFileName) || sharedFileName.equals(selectedFileName)) {
         return sh;
+      }
     }
 
-    System.out.println("SharedFileHeader couldn't find on networkIndex");
+    System.out.println("SharedFileHeader couldn't find on Index");
     return null;
   }
 
+
+  public SharedFileHeader findIndex(Integer selectedFileNDNid) {
+    for (SharedFileHeader sh :
+            this.getSharedFileHeaders()) {
+      Integer sharedFileName = sh.getNDNID();
+      System.out.println("COMPARING: '" + sharedFileName + "' vs '" + selectedFileNDNid +"'");
+      if (sharedFileName == selectedFileNDNid || selectedFileNDNid.equals(sharedFileName) || sharedFileName.equals(selectedFileNDNid)) {
+        return sh;
+      }
+    }
+
+    System.out.println("SharedFileHeader couldn't find on Index");
+    return null;
+  }
+
+
+  public Integer getNDNcount() {
+    ndncount++;
+    return ndncount;
+  }
 }

@@ -2,7 +2,6 @@ package org.organet.commons.inofy.Model;
 
 import org.organet.commons.inofy.FileTypes;
 import org.organet.commons.inofy.Hasher;
-import org.organet.commons.inofy.KeywordList;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,18 +15,22 @@ import java.util.List;
 
 // FIXME Do NOT extend File
 public class SharedFileHeader extends File implements Serializable {
-  private String ndnid = null; // Named Data Network Identifier
+  private Integer ndnid = null; // Named Data Network Identifier
   private String ndntype = null; // Named Data Network File Type
   private transient String localPath = null; // Absolute path of the file, MUST be set by Watcher, TODO when not extending the File, rename it to 'path
   private transient long lastModified = -1; // TODO Is this really necessary?
   private String hash = null; // TODO Is this transient or not?
-
+  public String fileName;
   public String getIp() {
     return ip;
   }
 
   public void setIp(String ip) {
     this.ip = ip;
+  }
+
+  public String getFileName() {
+    return fileName;
   }
 
   private String ip;
@@ -38,6 +41,7 @@ public class SharedFileHeader extends File implements Serializable {
   private void initialize() {
     ndntype = FileTypes.getFileType(getExtension());
     keywords.add(getName());
+    fileName = getName();
     try {
       ip = InetAddress.getLocalHost().getHostAddress().toString();
     } catch (UnknownHostException e) {
@@ -75,7 +79,7 @@ public class SharedFileHeader extends File implements Serializable {
     return new SharedFileHeader(file.getPath());
   }
 
-  public String getNDNID() {
+  public Integer getNDNID() {
     return ndnid;
   }
 
@@ -135,7 +139,7 @@ public class SharedFileHeader extends File implements Serializable {
   }
 
   public String getScreenName(){
-    return getName() +" - "+ ip;
+    return ndnid +" - "+getName() +" - "+ ip;
   }
 
   // TODO `compareTo()`
@@ -148,8 +152,9 @@ public class SharedFileHeader extends File implements Serializable {
   @Override
   public String toString() {
     return "SharedFileHeader{" +
-            "ip='" +ip+"\'"+
-            "ndnid='" + ndnid + '\'' +
+            "fileName='"+ fileName +"\'"+
+            ", ip='" +ip+"\'"+
+            ", ndnid='" + ndnid + '\'' +
             ", ndntype='" + ndntype + '\'' +
             ", keywords=" + keywords +
             ", localPath='" + localPath + '\'' +
@@ -157,5 +162,10 @@ public class SharedFileHeader extends File implements Serializable {
             ", hash='" + getHash() + '\'' +
             ", size=" + getSize() +
             '}';
+  }
+
+  public void setNDNid(Integer NDNid) {
+    this.ndnid = NDNid;
+
   }
 }

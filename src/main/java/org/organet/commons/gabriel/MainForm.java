@@ -77,8 +77,7 @@ public class MainForm extends JFrame {
     IpListBox.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     IpListBox.setPreferredSize(new Dimension(10,700));
 
-
-   IpListBox.setLayoutOrientation(JList.HORIZONTAL_WRAP);
+    IpListBox.setLayoutOrientation(JList.HORIZONTAL_WRAP);
     IpListBox.setVisibleRowCount(10);
 
     IpListBox.revalidate();
@@ -99,8 +98,6 @@ public class MainForm extends JFrame {
     ScanNetworkButton.addActionListener(this::ScanNetworkButtonActionPerformed);
     ConnectButton.addActionListener(this::ConnectButtonActionPerformed);
     downloadButton.addActionListener(this::downloadButtonActionPerformed);
-
-//      FileDetailsLabel.se
 
     introducer = App.getIntroducer();
 
@@ -129,38 +126,30 @@ public class MainForm extends JFrame {
               App.chosenSharedFileHeader = sfh;
               sfh.getKeywords().forEach(p-> KeywordsModel.addElement(p.toString()));
               fillFileHeader(sfh);
-
-          }
-
-      });
-      deleteKeyword.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-              String keyword = ( String) keywords.getSelectedValue();
-                if(keyword==null) {
-                    JOptionPane.showMessageDialog(null, "Please choose 1 keyword to delete.");
-                    return;
-                }
-              App.chosenSharedFileHeader.getKeywords().remove(keyword);
-              KeywordsModel.removeElement(keyword);
           }
       });
-      addKeyword.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-              if(App.chosenSharedFileHeader == null){
-                  JOptionPane.showMessageDialog(null, "Please choose 1 File to add keyword.");
-                    return;
-              }
-              if(keywordsTextField == null || keywordsTextField.getText().length()==0 ){
-                  JOptionPane.showMessageDialog(null, "Please write keyword to add.");
-                    return;
-              }
-              App.chosenSharedFileHeader.getKeywords().add(keywordsTextField.getText());
-              KeywordsModel.addElement(keywordsTextField.getText());
-              keywordsTextField.setText("");
-              fillFileHeader(App.chosenSharedFileHeader );
+      deleteKeyword.addActionListener(e -> {
+          String keyword = ( String) keywords.getSelectedValue();
+            if(keyword==null) {
+                JOptionPane.showMessageDialog(null, "Please choose 1 keyword to delete.");
+                return;
+            }
+          App.chosenSharedFileHeader.getKeywords().remove(keyword);
+          KeywordsModel.removeElement(keyword);
+      });
+      addKeyword.addActionListener(e -> {
+          if(App.chosenSharedFileHeader == null){
+              JOptionPane.showMessageDialog(null, "Please choose 1 File to add keyword.");
+                return;
           }
+          if(keywordsTextField == null || keywordsTextField.getText().length()==0 ){
+              JOptionPane.showMessageDialog(null, "Please write keyword to add.");
+                return;
+          }
+          App.chosenSharedFileHeader.getKeywords().add(keywordsTextField.getText());
+          KeywordsModel.addElement(keywordsTextField.getText());
+          keywordsTextField.setText("");
+          fillFileHeader(App.chosenSharedFileHeader );
       });
 
 
@@ -170,21 +159,15 @@ public class MainForm extends JFrame {
       pack();
 
 
-      filterButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-                ArrayList<SharedFileHeader> found = (ArrayList) ConnectionManager.networkIndex.search(searchText.getText());
-                NetworkIndexListModel.removeAllElements();
-                found.forEach(p->NetworkIndexListModel.addElement(p.getScreenName()));
-          }
+      filterButton.addActionListener(e -> {
+            ArrayList<SharedFileHeader> found = (ArrayList) ConnectionManager.networkIndex.search(searchText.getText());
+            NetworkIndexListModel.removeAllElements();
+            found.forEach(p->NetworkIndexListModel.addElement(p.getScreenName()));
       });
-      clearFilterButton.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-              NetworkIndexListModel.removeAllElements();
-              ConnectionManager.networkIndex.getSharedFileHeaders().forEach(P->NetworkIndexListModel.addElement(P.getScreenName()));
-              searchText.setText("");
-          }
+      clearFilterButton.addActionListener(e -> {
+          NetworkIndexListModel.removeAllElements();
+          ConnectionManager.networkIndex.getSharedFileHeaders().forEach(P->NetworkIndexListModel.addElement(P.getScreenName()));
+          searchText.setText("");
       });
   }
 

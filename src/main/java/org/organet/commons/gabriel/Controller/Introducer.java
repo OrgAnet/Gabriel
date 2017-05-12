@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 /**
  * This class is to Introduce new node to the current node. It
- * creates a Connection object and listens for new connection.
+ * creates a Connection object and listens for new socket.
  */
 public class Introducer implements Runnable {
   private ArrayList<Node> nodes = new ArrayList<>();
@@ -25,7 +25,7 @@ public class Introducer implements Runnable {
   public void run() {
     throw new UnsupportedOperationException("Not supported yet."); // FIXME
 
-//    // When new connection comes add it to connections
+//    // When new socket comes add it to connections
 //    while (true) {
 //      //TODO: Search for why we should use logger.
 //      System.out.println("Node " + connectionSocket.getInetAddress() + ":" + connectionSocket.getPort() + " is connected.");

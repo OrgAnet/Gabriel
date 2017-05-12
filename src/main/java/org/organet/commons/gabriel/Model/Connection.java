@@ -1,10 +1,9 @@
 package org.organet.commons.gabriel.Model;
 
+import org.organet.commons.gabriel.Controller.ListenCommands;
 import org.organet.commons.inofy.Index;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,13 +12,13 @@ public class Connection {
   Inet4Address connectionIp;
 
   Socket connectionSocket;
-  ServerSocket listenSocket;
 
   Index connectionIndex;
 
-
   OutputStream os;
   InputStream is;
+  ListenCommands listenCommands;
+
 
   public Index getConnectionIndex() {
     return connectionIndex;
@@ -38,6 +37,8 @@ public class Connection {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    listenCommands = new ListenCommands(connectionSocket);
+
   }
 
   public Inet4Address getConnectionIp() {
@@ -61,19 +62,20 @@ public class Connection {
     return "Connection{" + "connectionIp=" + connectionIp + '}';
   }
 
-  public void requestFile(String ndnid) {
+  public void requestFile(Integer ndnId) {
     try {
 
       System.out.println(connectionSocket);
-      OutputStream os = connectionSocket.getOutputStream();
+      OutputStreamWriter os = new OutputStreamWriter(connectionSocket.getOutputStream());
+      os.write(("GET - " + ndnId+"\n"));
+      os.flush();
 
-      os.write(("GET " + ndnid).getBytes());
-      os.close();
-
+      readFile("xx");
 
     } catch (IOException e) {
       e.printStackTrace();
     }
+
 
   }
 
@@ -83,4 +85,32 @@ public class Connection {
   public InputStream getInputStream() {
     return is;
   }
+
+  public void readFile(String fileName) {
+    try {
+      FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+      BufferedInputStream bufferedInputStream = new BufferedInputStream(connectionSocket.getInputStream());
+      int c;
+      while( (c=bufferedInputStream.read())!=-1){
+        fileOutputStream.write(c);
+      }
+      fileOutputStream.flush();
+      fileOutputStream.close();
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+  }
+
+
+  public ListenCommands getListenCommands() {
+    return listenCommands;
+  }
+
+  public void setListenCommands(ListenCommands listenCommands) {
+    this.listenCommands = listenCommands;
+  }
+
 }
