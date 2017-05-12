@@ -144,7 +144,8 @@ public class ConnectionManager {
       System.out.println("Error file not specified");
       return;
     }
+    String fileName = selectedString.split(" - ")[1];
 
-    connections.get(0).requestFile(selectedNDNid);   //first find IP to decide who to ask.
+    connections.get(0).requestFile(selectedNDNid, fileName);   //first find IP to decide who to ask.
   }
 }

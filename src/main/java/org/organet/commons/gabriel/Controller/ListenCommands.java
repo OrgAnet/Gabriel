@@ -28,31 +28,50 @@ public class ListenCommands extends Thread {
         try {
 
             Thread.sleep(1300);
-            InputStreamReader inputStreamReader =new InputStreamReader(socket.getInputStream());
-            String buffer = new String();
-            System.out.println("waiting to Listen command");
-            int a=0;
-            while ( ( a=inputStreamReader.read()) !='\n'){
-               buffer+=(char)a;
-            }
-
-//            Thread.sleep(1300);
-
-            System.out.print("command listened: ");
-            System.out.println(buffer);
-            String fileNDNid = new String(buffer);
-            fileNDNid = fileNDNid.split(" - ")[1];
-            Integer fileNDNnumber = Integer.parseInt(fileNDNid);
-
-            SharedFileHeader sharedFileHeader = App.localIndex.findIndex(fileNDNnumber);
-            FileInputStream fileInputStream = new FileInputStream(sharedFileHeader.getAbsoluteFile());
+            BufferedReader inputStreamReader =new BufferedReader( new InputStreamReader(socket.getInputStream()));
 
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
-            int c;
-            while ( (c=fileInputStream.read())!=-1){
-                outputStreamWriter.write(c);
-            }
 
+            System.out.println("waiting to Listen command");
+            String commandOrFileFirstLine;
+            while(true) {
+                commandOrFileFirstLine = inputStreamReader.readLine();
+
+                if (commandOrFileFirstLine.startsWith("GET")) {
+                    //Send File
+                    System.out.print("command listened: " + commandOrFileFirstLine);
+                    String fileNDNid = commandOrFileFirstLine.split(" - ")[1];
+                    Integer fileNDNnumber = Integer.parseInt(fileNDNid);
+
+                    SharedFileHeader sharedFileHeader = App.localIndex.findIndex(fileNDNnumber);
+                    BufferedReader fileInputStream = new BufferedReader(new FileReader(sharedFileHeader.getAbsoluteFile()));
+
+                    String c;
+                    while ((c = fileInputStream.readLine()) != null) {
+                        outputStreamWriter.write(c+"\n");
+                    }
+                    outputStreamWriter.flush();
+                } else {
+                    //get file
+
+                    BufferedWriter fileOutputStream = new BufferedWriter(new PrintWriter(App.mainForm.getNetworkIndexListBox().getSelectedValue().split(" - ")[1]));
+                    //BufferedReader bufferedInputStream = new BufferedReader(new InputStreamReader (socket.getInputStream()));
+
+                    String x=commandOrFileFirstLine;
+                    do {
+                        fileOutputStream.write(x);
+                        fileOutputStream.flush();
+                        if(inputStreamReader.ready()) {
+                            fileOutputStream.newLine();
+                            x = inputStreamReader.readLine();
+                        }
+                        else
+                            break;
+                    }while(x!=null);
+
+                    fileOutputStream.close();
+                }
+            }
 
         } catch (IOException e) {
             e.printStackTrace();

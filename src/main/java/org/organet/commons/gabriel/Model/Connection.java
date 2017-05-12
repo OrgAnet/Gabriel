@@ -62,7 +62,7 @@ public class Connection {
     return "Connection{" + "connectionIp=" + connectionIp + '}';
   }
 
-  public void requestFile(Integer ndnId) {
+  public void requestFile(Integer ndnId,String fileName) {
     try {
 
       System.out.println(connectionSocket);
@@ -70,12 +70,9 @@ public class Connection {
       os.write(("GET - " + ndnId+"\n"));
       os.flush();
 
-      readFile("xx");
-
     } catch (IOException e) {
       e.printStackTrace();
     }
-
 
   }
 
@@ -84,24 +81,6 @@ public class Connection {
   }
   public InputStream getInputStream() {
     return is;
-  }
-
-  public void readFile(String fileName) {
-    try {
-      FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-      BufferedInputStream bufferedInputStream = new BufferedInputStream(connectionSocket.getInputStream());
-      int c;
-      while( (c=bufferedInputStream.read())!=-1){
-        fileOutputStream.write(c);
-      }
-      fileOutputStream.flush();
-      fileOutputStream.close();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
   }
 
 
