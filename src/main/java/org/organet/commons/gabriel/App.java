@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class App {
-  final static String SUBNET = "10.253.75"; // 10.253.74
+  final static String SUBNET = "192.168.1"; // 10.253.74
 
   public static Index localIndex = null;
 
