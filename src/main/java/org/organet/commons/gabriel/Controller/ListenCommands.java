@@ -35,40 +35,42 @@ public class ListenCommands extends Thread {
             System.out.println("waiting to Listen command");
             String commandOrFileFirstLine;
             while(true) {
-                commandOrFileFirstLine = inputStreamReader.readLine();
+                char[] buff = new char[3];
+                int output = inputStreamReader.read(buff,0,3);
+                commandOrFileFirstLine = new String(buff);
 
                 if (commandOrFileFirstLine.startsWith("GET")) {
                     //Send File
+                    commandOrFileFirstLine = "GET" + inputStreamReader.readLine();
                     System.out.print("command listened: " + commandOrFileFirstLine);
                     String fileNDNid = commandOrFileFirstLine.split(" - ")[1];
                     Integer fileNDNnumber = Integer.parseInt(fileNDNid);
 
                     SharedFileHeader sharedFileHeader = App.localIndex.findIndex(fileNDNnumber);
                     BufferedReader fileInputStream = new BufferedReader(new FileReader(sharedFileHeader.getAbsoluteFile()));
-
-                    String c;
-                    while ((c = fileInputStream.readLine()) != null) {
-                        outputStreamWriter.write(c+"\n");
+                    outputStreamWriter.write("SEN");
+                    Thread.sleep(300);
+                    int c;
+                    while ((c = fileInputStream.read()) != -1) {
+                        outputStreamWriter.write(c);
+                        outputStreamWriter.flush();
                     }
-                    outputStreamWriter.flush();
+                    fileInputStream.close();
                 } else {
                     //get file
 
                     BufferedWriter fileOutputStream = new BufferedWriter(new PrintWriter(App.mainForm.getNetworkIndexListBox().getSelectedValue().split(" - ")[1]));
                     //BufferedReader bufferedInputStream = new BufferedReader(new InputStreamReader (socket.getInputStream()));
-
-                    String x=commandOrFileFirstLine;
+                    int c;
                     do {
-                        fileOutputStream.write(x);
-                        fileOutputStream.flush();
                         if(inputStreamReader.ready()) {
-                            fileOutputStream.newLine();
-                            x = inputStreamReader.readLine();
+                            c = inputStreamReader.read();
+                            fileOutputStream.write(c);
+                            fileOutputStream.flush();
                         }
                         else
                             break;
-                    }while(x!=null);
-
+                    }while(c!=-1);
                     fileOutputStream.close();
                 }
             }
