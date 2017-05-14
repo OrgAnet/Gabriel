@@ -145,7 +145,7 @@ public class ConnectionManager {
       return;
     }
     String fileName = selectedString.split(" - ")[1];
-
+    //TODO: secili dosyanin oldugu nodedan dosyayi iste
     connections.get(0).requestFile(selectedNDNid, fileName);   //first find IP to decide who to ask.
   }
 }

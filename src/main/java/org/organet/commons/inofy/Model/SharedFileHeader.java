@@ -13,7 +13,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-// FIXME Do NOT extend File
+
 public class SharedFileHeader extends File implements Serializable {
   private Integer ndnid = null; // Named Data Network Identifier
   private String ndntype = null; // Named Data Network File Type

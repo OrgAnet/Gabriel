@@ -38,7 +38,7 @@ public class ListenCommands extends Thread {
                 char[] buff = new char[3];
                 int output = inputStreamReader.read(buff,0,3);
                 commandOrFileFirstLine = new String(buff);
-
+                System.out.println("command received" + commandOrFileFirstLine);
                 if (commandOrFileFirstLine.startsWith("GET")) {
                     //Send File
                     commandOrFileFirstLine = "GET" + inputStreamReader.readLine();
@@ -47,30 +47,35 @@ public class ListenCommands extends Thread {
                     Integer fileNDNnumber = Integer.parseInt(fileNDNid);
 
                     SharedFileHeader sharedFileHeader = App.localIndex.findIndex(fileNDNnumber);
-                    BufferedReader fileInputStream = new BufferedReader(new FileReader(sharedFileHeader.getAbsoluteFile()));
+                    BufferedInputStream fileInputStream = new  BufferedInputStream(new FileInputStream(sharedFileHeader.getAbsoluteFile()),1024);
                     outputStreamWriter.write("SEN");
                     Thread.sleep(300);
                     int c;
+                    int x =0;
                     while ((c = fileInputStream.read()) != -1) {
                         outputStreamWriter.write(c);
-                        outputStreamWriter.flush();
+                        x++;
                     }
+                    System.out.println("bytes sent : "+x);
+                    outputStreamWriter.flush();
                     fileInputStream.close();
                 } else {
                     //get file
+                    File file = new File(App.mainForm.getNetworkIndexListBox().getSelectedValue().split(" - ")[1]);
 
-                    BufferedWriter fileOutputStream = new BufferedWriter(new PrintWriter(App.mainForm.getNetworkIndexListBox().getSelectedValue().split(" - ")[1]));
+                    BufferedOutputStream fileOutputStream = new BufferedOutputStream(new FileOutputStream(file),1024) ;
                     //BufferedReader bufferedInputStream = new BufferedReader(new InputStreamReader (socket.getInputStream()));
                     int c;
+                    int x=0;
                     do {
-                        if(inputStreamReader.ready()) {
-                            c = inputStreamReader.read();
-                            fileOutputStream.write(c);
-                            fileOutputStream.flush();
-                        }
-                        else
-                            break;
-                    }while(c!=-1);
+                        c = inputStreamReader.read();
+                        fileOutputStream.write(c);
+                        x++;
+                    }while(x < 95859791);
+                    //}while(c!=-1);
+
+                    System.out.println("bytes read : "+x);
+                    fileOutputStream.flush();
                     fileOutputStream.close();
                 }
             }
