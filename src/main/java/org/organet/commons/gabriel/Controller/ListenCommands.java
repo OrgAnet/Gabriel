@@ -29,7 +29,7 @@ public class ListenCommands extends Thread {
         try {
 
             Thread.sleep(1300);
-            BufferedReader inputStreamReader =new BufferedReader( new InputStreamReader(socket.getInputStream()));
+            BufferedReader bufferedInputStreamReader =new BufferedReader( new InputStreamReader(socket.getInputStream()));
 
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
 
@@ -37,18 +37,22 @@ public class ListenCommands extends Thread {
             String commandOrFileFirstLine;
             while(true) {
                 char[] buff = new char[3];
-                int output = inputStreamReader.read(buff,0,3);
+                int output = bufferedInputStreamReader.read(buff,0,3);
                 commandOrFileFirstLine = new String(buff);
                 System.out.println("command received" + commandOrFileFirstLine);
                 if (commandOrFileFirstLine.startsWith("GET")) {
                     //Send File
-                    commandOrFileFirstLine = "GET" + inputStreamReader.readLine();
+                    commandOrFileFirstLine = "GET" + bufferedInputStreamReader.readLine();
                     System.out.print("command listened: " + commandOrFileFirstLine);
                     String fileNDNid = commandOrFileFirstLine.split(" - ")[1];
                     Integer fileNDNnumber = Integer.parseInt(fileNDNid);
 
                     SharedFileHeader sharedFileHeader = App.localIndex.findIndex(fileNDNnumber);
+                    //If sharedFileHeader==null -> App.remoteIndex.findIndex(ndnInd){ retrieve from other node.
+
+                    //else , retrieve from file.
                     BufferedInputStream bufferedFileInputStream = new  BufferedInputStream(new FileInputStream(sharedFileHeader.getAbsoluteFile()),1024);
+
                     outputStreamWriter.write("SEN");
                     Thread.sleep(300);
                     int c;
@@ -60,7 +64,7 @@ public class ListenCommands extends Thread {
                     System.out.println("bytes sent : "+x);
                     outputStreamWriter.flush();
                     bufferedFileInputStream.close();
-                } else {
+                } else if(commandOrFileFirstLine.startsWith("SEN")){
                     //Receiving file from other node.
 
                     String chosenName = App.mainForm.getNetworkIndexListBox().getSelectedValue();
@@ -73,7 +77,7 @@ public class ListenCommands extends Thread {
                     int c;
                     int x=0;
                     do {
-                        c = inputStreamReader.read();
+                        c = bufferedInputStreamReader.read();
                         bufferedFileOutputStream.write(c);
                         x++;
                     }while(x < sharedFileHeader.length());
@@ -81,6 +85,10 @@ public class ListenCommands extends Thread {
                     System.out.println("bytes read : "+x);
                     bufferedFileOutputStream.flush();
                     bufferedFileOutputStream.close();
+                }
+                else if(commandOrFileFirstLine.startsWith("NEW")){
+                    //ObjectInputStream objectInputStream = new ObjectInputStream(new InputStreamReader( bufferedInputStreamReader));
+
                 }
             }
 

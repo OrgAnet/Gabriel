@@ -1,11 +1,16 @@
 package org.organet.commons.inofy;
 
 import org.organet.commons.gabriel.App;
+import org.organet.commons.gabriel.ConnectionManager;
+import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.inofy.Model.SharedFileHeader;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,6 +120,7 @@ public class Watcher implements Runnable {
               if (Files.isDirectory(child, NOFOLLOW_LINKS)) {
                 registerAll(child);
               }
+              //
             } catch (IOException x) {
               // ignore to keep sample readable
             }
@@ -136,6 +142,30 @@ public class Watcher implements Runnable {
             // FIXME Implement this behaviour in another way (i.e. anywhere else) \
             // filename MUST stay as it is, it is not the problem here
             App.mainForm.LocalIndexListModel.addElement(filename.toString());
+            // TODO Propagate new shared file to all connected nodes
+            ArrayList<Connection> conns = ConnectionManager.getConnections();
+            for (Connection c : conns) {
+              String command = "NEW";
+              OutputStreamWriter os = null;
+              try {
+                os = new OutputStreamWriter(c.getConnectionSocket().getOutputStream());
+                os.write(command);
+                os.flush();
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+              try {
+                Thread.sleep(300);
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(c.getConnectionSocket().getOutputStream());
+                objectOutputStream.writeObject(sh);
+              } catch (IOException e) {
+                e.printStackTrace();
+              } catch (InterruptedException e) {
+                e.printStackTrace();
+              }
+            }
+
+
           } else if (kind == ENTRY_MODIFY) {
             // TODO Re-calculate the hash and update the local index
           } else if (kind == ENTRY_DELETE) {
