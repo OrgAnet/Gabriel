@@ -104,7 +104,7 @@ public class ConnectionManager {
   }
 
 
-  public Index getNetworkIndex() {
+  public static Index getNetworkIndex() {
     return networkIndex;
   }
 

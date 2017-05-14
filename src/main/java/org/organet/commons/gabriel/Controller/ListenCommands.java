@@ -1,6 +1,7 @@
 package org.organet.commons.gabriel.Controller;
 
 import org.organet.commons.gabriel.App;
+import org.organet.commons.gabriel.ConnectionManager;
 import org.organet.commons.inofy.Model.SharedFileHeader;
 
 import java.io.*;
@@ -47,36 +48,39 @@ public class ListenCommands extends Thread {
                     Integer fileNDNnumber = Integer.parseInt(fileNDNid);
 
                     SharedFileHeader sharedFileHeader = App.localIndex.findIndex(fileNDNnumber);
-                    BufferedInputStream fileInputStream = new  BufferedInputStream(new FileInputStream(sharedFileHeader.getAbsoluteFile()),1024);
+                    BufferedInputStream bufferedFileInputStream = new  BufferedInputStream(new FileInputStream(sharedFileHeader.getAbsoluteFile()),1024);
                     outputStreamWriter.write("SEN");
                     Thread.sleep(300);
                     int c;
                     int x =0;
-                    while ((c = fileInputStream.read()) != -1) {
+                    while ((c = bufferedFileInputStream.read()) != -1) {
                         outputStreamWriter.write(c);
                         x++;
                     }
                     System.out.println("bytes sent : "+x);
                     outputStreamWriter.flush();
-                    fileInputStream.close();
+                    bufferedFileInputStream.close();
                 } else {
-                    //get file
-                    File file = new File(App.mainForm.getNetworkIndexListBox().getSelectedValue().split(" - ")[1]);
+                    //Receiving file from other node.
 
-                    BufferedOutputStream fileOutputStream = new BufferedOutputStream(new FileOutputStream(file),1024) ;
-                    //BufferedReader bufferedInputStream = new BufferedReader(new InputStreamReader (socket.getInputStream()));
+                    String chosenName = App.mainForm.getNetworkIndexListBox().getSelectedValue();
+                    //create the file
+                    String [] text=chosenName.split(" - ");
+                    File file = new File(text[1]);
+                    SharedFileHeader sharedFileHeader = ConnectionManager.getNetworkIndex().findIndex(text[1]);
+                    //start receiving.
+                    BufferedOutputStream bufferedFileOutputStream = new BufferedOutputStream(new FileOutputStream(file),1024) ;
                     int c;
                     int x=0;
                     do {
                         c = inputStreamReader.read();
-                        fileOutputStream.write(c);
+                        bufferedFileOutputStream.write(c);
                         x++;
-                    }while(x < 95859791);
-                    //}while(c!=-1);
+                    }while(x < sharedFileHeader.length());
 
                     System.out.println("bytes read : "+x);
-                    fileOutputStream.flush();
-                    fileOutputStream.close();
+                    bufferedFileOutputStream.flush();
+                    bufferedFileOutputStream.close();
                 }
             }
 
