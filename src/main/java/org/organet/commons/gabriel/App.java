@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 public class App {
   final static String SUBNET = "192.168.1"; // 10.253.74
-
+  static String sharedDirPath;
   public static Index localIndex = null;
 
   private static ArrayList<Node> nodeList;
@@ -53,7 +53,7 @@ public class App {
     mainForm = new MainForm();
     mainForm.setVisible(true);
 
-    String sharedDirPath = args[0];
+    sharedDirPath = args[0];
     File sharedDir = new File(sharedDirPath);
     localIndex = new Index(true);
 
@@ -159,5 +159,13 @@ public class App {
     }
 
     return idBuilder.toString();
+  }
+
+  public static String getSharedDirPath() {
+    return sharedDirPath;
+  }
+
+  public static void setSharedDirPath(String sharedDirPath) {
+    App.sharedDirPath = sharedDirPath;
   }
 }
