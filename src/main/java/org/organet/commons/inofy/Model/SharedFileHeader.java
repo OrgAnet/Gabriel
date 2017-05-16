@@ -18,20 +18,11 @@ public class SharedFileHeader extends File implements Serializable {
   private Integer ndnid = null; // Named Data Network Identifier
   private String ndntype = null; // Named Data Network File Type
   private transient String localPath = null; // Absolute path of the file, MUST be set by Watcher, TODO when not extending the File, rename it to 'path
-  private transient long lastModified = -1; // TODO Is this really necessary?
-  private String hash = null; // TODO Is this transient or not?
+  private transient long lastModified = -1;
+  private String hash = null;
+  private Long size= Long.valueOf(0);
+
   public String fileName;
-  public String getIp() {
-    return ip;
-  }
-
-  public void setIp(String ip) {
-    this.ip = ip;
-  }
-
-  public String getFileName() {
-    return fileName;
-  }
 
   private String ip;
 
@@ -48,6 +39,7 @@ public class SharedFileHeader extends File implements Serializable {
       e.printStackTrace();
     }
     hash = getHash();
+    size = length();
   }
 
   public SharedFileHeader(String pathname) {
@@ -121,10 +113,6 @@ public class SharedFileHeader extends File implements Serializable {
     return getHash(false);
   }
 
-  long getSize() {
-    return length();
-  }
-
   long getLastModified() {
     return lastModified();
   }
@@ -133,7 +121,6 @@ public class SharedFileHeader extends File implements Serializable {
     return (getPath() == null && lastModified == -1);
   }
 
-  // Keyword can be Java regex string
   public boolean hasKeyword(String keyword) {
     return keywords.contains(keyword);
   }
@@ -141,9 +128,6 @@ public class SharedFileHeader extends File implements Serializable {
   public String getScreenName(){
     return ndnid +" - "+getName() +" - "+ ip;
   }
-
-  // TODO `compareTo()`
-
 
   public List<String> getKeywords() {
     return keywords;
@@ -166,6 +150,25 @@ public class SharedFileHeader extends File implements Serializable {
 
   public void setNDNid(Integer NDNid) {
     this.ndnid = NDNid;
+  }
 
+  public void setSize(Long size) {
+    this.size = size;
+  }
+
+  public String getIp() {
+    return ip;
+  }
+
+  public long getSize() {
+    return size;
+  }
+
+  public void setIp(String ip) {
+    this.ip = ip;
+  }
+
+  public String getFileName() {
+    return fileName;
   }
 }

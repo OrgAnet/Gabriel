@@ -49,8 +49,6 @@ public class ConnectionManager {
 
         App.mainForm.getConnectionListModel().addElement(newIncomingConnection.getConnectionIp().toString());
 
-
-
         new Thread(newIncomingConnection.getListenCommands()).start();
 
         System.out.println("started listening");

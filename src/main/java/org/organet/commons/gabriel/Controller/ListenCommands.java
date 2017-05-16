@@ -2,6 +2,8 @@ package org.organet.commons.gabriel.Controller;
 
 import org.organet.commons.gabriel.App;
 import org.organet.commons.gabriel.ConnectionManager;
+import org.organet.commons.gabriel.Model.Connection;
+import org.organet.commons.inofy.Index;
 import org.organet.commons.inofy.Model.SharedFileHeader;
 
 import java.io.*;
@@ -40,6 +42,7 @@ public class ListenCommands extends Thread {
                 int output = bufferedInputStreamReader.read(buff,0,3);
                 commandOrFileFirstLine = new String(buff);
                 System.out.println("command received" + commandOrFileFirstLine);
+
                 if (commandOrFileFirstLine.startsWith("GET")) {
                     //Send File
                     commandOrFileFirstLine = "GET" + bufferedInputStreamReader.readLine();
@@ -54,6 +57,7 @@ public class ListenCommands extends Thread {
                     BufferedInputStream bufferedFileInputStream = new  BufferedInputStream(new FileInputStream(sharedFileHeader.getAbsoluteFile()),1024);
 
                     outputStreamWriter.write("SEN");
+                    outputStreamWriter.flush();
                     Thread.sleep(300);
                     int c;
                     int x =0;
@@ -80,15 +84,32 @@ public class ListenCommands extends Thread {
                         c = bufferedInputStreamReader.read();
                         bufferedFileOutputStream.write(c);
                         x++;
-                    }while(x < sharedFileHeader.length());
+                    }while(x < sharedFileHeader.getSize());
 
                     System.out.println("bytes read : "+x);
                     bufferedFileOutputStream.flush();
                     bufferedFileOutputStream.close();
                 }
                 else if(commandOrFileFirstLine.startsWith("NEW")){
-                    //ObjectInputStream objectInputStream = new ObjectInputStream(new InputStreamReader( bufferedInputStreamReader));
+                    try {
+                        ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
+                        SharedFileHeader sh;
+                        boolean flag = true;
+                        while (flag) {
+                            try {
+                                sh = (SharedFileHeader) objectInputStream.readObject();
+                                System.out.println("NEW SharedFileHeader read successfully: " + sh.toString());
+                                ConnectionManager.getNetworkIndex().add(sh);
+                                App.mainForm.getNetworkIndexListModel().addElement(sh.getScreenName());
 
+                                flag = false;
+                            } catch (EOFException ex) {
+                                flag = true;
+                            }
+                        }
+                    } catch (ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
