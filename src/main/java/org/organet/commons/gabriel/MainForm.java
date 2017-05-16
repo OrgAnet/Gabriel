@@ -112,6 +112,7 @@ public class MainForm extends JFrame {
               super.mouseClicked(e);
               String a = (String) keywords.getSelectedValue();
               System.out.println("keyword " + a+ " clicked");
+
               //delete keyword
           }
       });
@@ -125,6 +126,7 @@ public class MainForm extends JFrame {
               SharedFileHeader sfh = App.localIndex.findIndex(name);
               App.chosenSharedFileHeader = sfh;
               sfh.getKeywords().forEach(p-> KeywordsModel.addElement(p.toString()));
+              setKeywordFieldsState(true);
               fillFileHeader(sfh);
           }
       });
@@ -152,13 +154,6 @@ public class MainForm extends JFrame {
           fillFileHeader(App.chosenSharedFileHeader );
       });
 
-
-      getAndListHosts();
-      setContentPane(panelMain);
-      setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-      pack();
-
-
       filterButton.addActionListener(e -> {
             ArrayList<SharedFileHeader> found = (ArrayList) ConnectionManager.networkIndex.search(searchText.getText());
             NetworkIndexListModel.removeAllElements();
@@ -169,12 +164,40 @@ public class MainForm extends JFrame {
           ConnectionManager.networkIndex.getSharedFileHeaders().forEach(P->NetworkIndexListModel.addElement(P.getScreenName()));
           searchText.setText("");
       });
+      NetworkIndexListBox.addMouseListener(new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+              super.mouseClicked(e);
+              String name = getNetworkIndexListBox().getSelectedValue();
+              name = name.split(" - ")[1];
+              System.out.println("Shared File " + name + " clicked ");
+              SharedFileHeader sfh = ConnectionManager.getNetworkIndex().findIndex(name);
+              App.chosenSharedFileHeader = sfh;
+              setKeywordFieldsState(false);
+              fillFileHeader(App.chosenSharedFileHeader );
+          }
+      });
+
+      getAndListHosts();
+      setContentPane(panelMain);
+      setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+      pack();
+  }
+
+  private void setKeywordFieldsState(boolean state){
+      keywordsTextField.setEnabled(state);
+      addKeyword.setEnabled(state);
+      deleteKeyword.setEnabled(state);
+      keywords.setEnabled(state);
+      if(!state){
+          keywords.removeAll();
+          KeywordsModel.removeAllElements();
+      }
   }
 
     private void fillFileHeader(SharedFileHeader sfh) {
-        fileHeaderInfo.setText(sfh.getName() + "\nKeywords:" );
+        fileHeaderInfo.setText(sfh.getName() + "\nKeywords:\n" );
         sfh.getKeywords().forEach(p->fileHeaderInfo.append("["+p+"]\n"));
-        fileHeaderInfo.append("Named Data Networking ID:" + sfh.getNDNID());
         fileHeaderInfo.append("\nIP: " + sfh.getIp());
     }
   private void downloadButtonActionPerformed(ActionEvent evt) {

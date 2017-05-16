@@ -54,14 +54,9 @@ public class Index implements Serializable {
     return false;
   }
 
-  // TODO Other 'contains' methods may be implemented \
-  // (e.g. `.contains(SharedFileHeader ...)` or `.contains(File ...`)
-
   public boolean add(SharedFileHeader sharedFileHeader) {
     sharedFileHeader.setNDNid(getNDNcount());
     return sharedFileHeaders.add(sharedFileHeader);
-    // TODO Invoke the necessary method to propagate the updated index (if the index is local)
-    // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
   public boolean remove(SharedFileHeader sharedFileHeader) {
@@ -145,8 +140,6 @@ public class Index implements Serializable {
       // doesn't exist - add the given shared file
       return add(sharedFileHeader);
     }
-    // TODO Invoke the necessary method to propagate the updated index (if the index is local)
-    // TODO TR Future work'e yaz: Sadece değişiklikler propagate edilebilir
   }
 
   public List<SharedFileHeader> search(String keyword) {
@@ -162,7 +155,6 @@ public class Index implements Serializable {
         }
       }
     }
-
     return foundSharedFileHeaders;
   }
 
@@ -184,7 +176,7 @@ public class Index implements Serializable {
     for (SharedFileHeader sh :
             this.getSharedFileHeaders()) {
       String sharedFileName = sh.getFileName();
-      System.out.println("COMPARING: '" + sharedFileName + "' vs '" + selectedFileName +"'");
+      //System.out.println("COMPARING: '" + sharedFileName + "' vs '" + selectedFileName +"'");
       if (sharedFileName == selectedFileName || selectedFileName.equals(sharedFileName) || sharedFileName.equals(selectedFileName)) {
         return sh;
       }
@@ -199,7 +191,7 @@ public class Index implements Serializable {
     for (SharedFileHeader sh :
             this.getSharedFileHeaders()) {
       Integer sharedFileName = sh.getNDNID();
-      System.out.println("COMPARING: '" + sharedFileName + "' vs '" + selectedFileNDNid +"'");
+    //  System.out.println("COMPARING: '" + sharedFileName + "' vs '" + selectedFileNDNid +"'");
       if (sharedFileName == selectedFileNDNid || selectedFileNDNid.equals(sharedFileName) || sharedFileName.equals(selectedFileNDNid)) {
         return sh;
       }

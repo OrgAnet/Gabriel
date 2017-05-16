@@ -17,7 +17,7 @@ import java.util.List;
 public class SharedFileHeader extends File implements Serializable {
   private Integer ndnid = null; // Named Data Network Identifier
   private String ndntype = null; // Named Data Network File Type
-  private transient String localPath = null; // Absolute path of the file, MUST be set by Watcher, TODO when not extending the File, rename it to 'path
+  private transient String localPath = null; // Absolute path of the file, MUST be set by Watcher,
   private transient long lastModified = -1;
   private String hash = null;
   private Long size= Long.valueOf(0);
@@ -32,6 +32,7 @@ public class SharedFileHeader extends File implements Serializable {
   private void initialize() {
     ndntype = FileTypes.getFileType(getExtension());
     keywords.add(getName());
+    keywords.add(ndntype);
     fileName = getName();
     try {
       ip = InetAddress.getLocalHost().getHostAddress().toString();
@@ -150,10 +151,6 @@ public class SharedFileHeader extends File implements Serializable {
 
   public void setNDNid(Integer NDNid) {
     this.ndnid = NDNid;
-  }
-
-  public void setSize(Long size) {
-    this.size = size;
   }
 
   public String getIp() {

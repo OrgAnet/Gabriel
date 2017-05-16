@@ -15,7 +15,7 @@ public class HostChecker extends Thread {
 
   @Override
   public void run() {
-    int timeout = 2400;
+    int timeout = 1200;
 
     try {
       if (InetAddress.getByName(hostName).isReachable(timeout)) {
@@ -28,4 +28,7 @@ public class HostChecker extends Thread {
       Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
+
+
+
 }
