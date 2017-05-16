@@ -45,6 +45,15 @@ public class Index implements Serializable {
     return false;
   }
 
+  public boolean isContainsHash(String fileHash) {
+    for (SharedFileHeader sharedFileHeader : sharedFileHeaders) {
+      if (sharedFileHeader.getHash().equals(fileHash)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   // TODO Other 'contains' methods may be implemented \
   // (e.g. `.contains(SharedFileHeader ...)` or `.contains(File ...`)
 

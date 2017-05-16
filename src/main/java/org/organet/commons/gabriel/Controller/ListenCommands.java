@@ -99,7 +99,7 @@ public class ListenCommands extends Thread {
                         while (flag) {
                             try {
                                 sh = (SharedFileHeader) objectInputStream.readObject();
-                                if(!App.localIndex.containsName(sh.fileName)) {  //to prevent flooding, if exists, dont Add
+                                if(!App.localIndex.isContainsHash(sh.getHash())) {  //to prevent flooding, if exists, dont Add
                                     System.out.println("NEW SharedFileHeader added to index successfully: " + sh.toString());
                                     ConnectionManager.getNetworkIndex().add(sh);
                                     App.mainForm.getNetworkIndexListModel().addElement(sh.getScreenName());

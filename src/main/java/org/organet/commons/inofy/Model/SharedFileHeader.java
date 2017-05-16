@@ -109,7 +109,7 @@ public class SharedFileHeader extends File implements Serializable {
     return hash;
   }
 
-  String getHash() {
+  public String getHash() {
     return getHash(false);
   }
 
