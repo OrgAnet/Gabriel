@@ -67,11 +67,9 @@ public class Connection {
       System.out.println("Sending " +  connectionSocket.getInetAddress() + " the command: GET NDNID:" + fileName);
       os.write(("GET - " + fileName+"\n"));
       os.flush();
-
     } catch (IOException e) {
       e.printStackTrace();
     }
-
   }
 
   public OutputStream getOutputStream() {

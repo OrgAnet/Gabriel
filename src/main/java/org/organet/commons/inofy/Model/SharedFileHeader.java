@@ -35,7 +35,10 @@ public class SharedFileHeader extends File implements Serializable {
     keywords.add(ndntype);
     fileName = getName();
     try {
-      ip = InetAddress.getLocalHost().getHostAddress().toString();
+      String ipd = InetAddress.getLocalHost().getHostAddress().toString();
+      if(ipd.startsWith("\\"))
+        ip =ipd.substring(1) ;
+      else ip = ipd;
     } catch (UnknownHostException e) {
       e.printStackTrace();
     }

@@ -24,12 +24,6 @@ public class Introducer implements Runnable {
   @Override
   public void run() {
     throw new UnsupportedOperationException("Not supported yet."); // FIXME
-
-//    // When new socket comes add it to connections
-//    while (true) {
-//      //TODO: Search for why we should use logger.
-//      System.out.println("Node " + connectionSocket.getInetAddress() + ":" + connectionSocket.getPort() + " is connected.");
-//    }
   }
 
   public void checkHostsBruteForce(String subnet) {

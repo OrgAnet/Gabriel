@@ -6,6 +6,7 @@ import org.organet.commons.gabriel.Helper;
 import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.inofy.Model.SharedFileHeader;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -69,24 +70,62 @@ public class ListenCommands extends Thread {
         System.out.print("command listened: " + commandOrFileFirstLine);
         String fileName = commandOrFileFirstLine.split(" - ")[1];
 
-        SharedFileHeader sharedFileHeader = App.localIndex.findIndex(fileName);
-        //If sharedFileHeader==null -> App.remoteIndex.findIndex(ndnInd){ retrieve from other node.
-
-        //else , retrieve from file.
-        BufferedInputStream bufferedFileInputStream = new  BufferedInputStream(new FileInputStream(sharedFileHeader.getAbsoluteFile()),1024);
-
         outputStreamWriter.write("SEN");
         outputStreamWriter.flush();
         Thread.sleep(300);
-        int c;
-        int x =0;
-        while ((c = bufferedFileInputStream.read()) != -1) {
-            outputStreamWriter.write(c);
-            x++;
+
+        //check requested file locally.
+        SharedFileHeader sharedFileHeader = App.localIndex.findIndex(fileName);
+        if(sharedFileHeader!=null){ //file found locally.
+            // retrieve from file.
+            BufferedInputStream bufferedFileInputStream = new  BufferedInputStream(new FileInputStream(sharedFileHeader.getAbsoluteFile()),1024);
+
+            int c;
+            int x =0;
+            while ((c = bufferedFileInputStream.read()) != -1) {
+                outputStreamWriter.write(c);
+                x++;
+            }
+            System.out.println("bytes sent : "+x);
+            outputStreamWriter.flush();
+            bufferedFileInputStream.close();
+        }else{
+            //if file is not local, check network Index.
+            sharedFileHeader = ConnectionManager.getNetworkIndex().findIndex(fileName);
+            //if file still not found. show error and exit.
+            if(sharedFileHeader == null){
+                JOptionPane.showMessageDialog(null, "Requested file not found.");
+                return;
+            }
+            String sourceIp= sharedFileHeader.getIp();
+            Connection sourceConnection = ConnectionManager.getConnection(sourceIp); /// find file source and receive from there and send to requested node.
+            sourceConnection.requestFile(sharedFileHeader.fileName);
+            redirectFile(sharedFileHeader, sourceConnection.getConnectionSocket(), socket);
+
         }
-        System.out.println("bytes sent : "+x);
-        outputStreamWriter.flush();
-        bufferedFileInputStream.close();
+
+
+    }
+
+    private void redirectFile(SharedFileHeader sh, Socket sourceSocket, Socket destinationSocket) {
+
+        try {
+            BufferedReader bufferedInputStreamReader = new BufferedReader( new InputStreamReader(sourceSocket.getInputStream()));
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(destinationSocket.getOutputStream());
+
+            int c;
+            int x=0;
+            do {
+                c = bufferedInputStreamReader.read();
+                outputStreamWriter.write(c);
+                x++;
+            }while(x < sh.getSize());
+            outputStreamWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     private void receiveNewFile(BufferedReader bufferedInputStreamReader) throws IOException {
@@ -123,16 +162,14 @@ public class ListenCommands extends Thread {
 
                         System.out.println("NEW SharedFileHeader added to index successfully: " + sh.toString());
                         sh.setNDNid(ConnectionManager.getNetworkIndex().getNDNcount());
+                        String ipd = socket.getInetAddress().toString();
+                        if (ipd.startsWith("/")) ipd = ipd.substring(1);
 
-                        sh.setIp(socket.getInetAddress().toString());  //Set Ip to received node.
+                        sh.setIp(ipd);  //Set Ip to received node.
 
                         ConnectionManager.getNetworkIndex().add(sh);
                         App.mainForm.getNetworkIndexListModel().addElement(sh.getScreenName());
 
-                        //Propagation to other nodes.
-//                        SharedFileHeader propagateHeader = sh;
-//                        propagateHeader.setIp("1.1.1.1");
-                        //propagateHeader.setIp( InetAddress.getLocalHost().getHostAddress().toString());
                         ConnectionManager.sendNewSharedFiletoNetwork(sh);
 
                     }else{

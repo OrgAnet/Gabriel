@@ -133,22 +133,22 @@ public class ConnectionManager {
 
   public static void downloadFile() {
     String selectedString = App.mainForm.getNetworkIndexListBox().getSelectedValue();
-
-    String selectedFileName = selectedString.split(" - ")[1];
+    String []data = selectedString.split(" - ");
+    String selectedFileName = data[1];
 
     System.out.println("chosen file to download: "+ selectedFileName);
     if (selectedFileName == null) {
       System.out.println("Error file not specified");
       return;
     }
-    connections.get(0).requestFile(selectedFileName);   //first find IP to decide who to ask.
+    getConnection(data[2]).requestFile(selectedFileName);   //first find IP to decide who to ask.
   }
 
   public static void sendNewSharedFiletoNetwork(SharedFileHeader sh) {
 
     // Create a shared file and add to the local index
     try {
-      Thread.sleep(300);
+      Thread.sleep(500);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
@@ -156,6 +156,11 @@ public class ConnectionManager {
     // TODO Propagate new shared file to all connected nodes
 
     for (Connection c : getConnections()) {
+      System.out.println("Comparing *" +c.getConnectionIp().toString() + "* ?= *" + sh.getIp()+"*");
+      if(c.getConnectionIp().toString().equals(sh.getIp())){
+        continue;
+      }
+
       String command = "NEW";
       OutputStreamWriter os = null;
       try {
@@ -181,5 +186,13 @@ public class ConnectionManager {
         e.printStackTrace();
       }
     }
+  }
+
+  public static Connection getConnection(String sourceIp) {
+      for(Connection c : getConnections()){
+        if(c.getConnectionIp().toString().equals(sourceIp));
+          return c;
+      }
+      return  null;
   }
 }
