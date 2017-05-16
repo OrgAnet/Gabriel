@@ -136,16 +136,16 @@ public class ConnectionManager {
 
   public static void downloadFile() {
     String selectedString = App.mainForm.getNetworkIndexListBox().getSelectedValue();
-    Integer selectedNDNid = Integer.parseInt(selectedString.split(" - ")[0]);
 
-    System.out.println("chosen file to download: "+ selectedNDNid);
-    if (selectedNDNid == null) {
+    String selectedFileName = selectedString.split(" - ")[1];
+
+    System.out.println("chosen file to download: "+ selectedFileName);
+    if (selectedFileName == null) {
       System.out.println("Error file not specified");
       return;
     }
-    String fileName = selectedString.split(" - ")[1];
-    //TODO: secili dosyanin oldugu nodedan dosyayi iste
-    connections.get(0).requestFile(selectedNDNid, fileName);   //first find IP to decide who to ask.
+
+    connections.get(0).requestFile(selectedFileName);   //first find IP to decide who to ask.
   }
 
   public static void sendNewSharedFiletoNetwork(Path child, Path fileName) {

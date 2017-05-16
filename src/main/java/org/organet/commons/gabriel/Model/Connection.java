@@ -62,7 +62,7 @@ public class Connection {
     return "Connection{" + "connectionIp=" + connectionIp + '}';
   }
 
-  public void requestFile(Integer ndnId,String fileName) {
+  public void requestFile(String fileName) {
     try {
 
       System.out.println(connectionSocket);

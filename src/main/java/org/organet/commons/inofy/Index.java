@@ -168,6 +168,7 @@ public class Index implements Serializable {
   public void addAllSharedFiles(Index newIndex){
     for (int i=0;i<newIndex.size();i++){
       this.add(newIndex.get(i));
+      newIndex.get(i).setNDNid(getNDNcount());
       App.mainForm.getNetworkIndexListModel().addElement(newIndex.get(i).getScreenName());
     }
   }
