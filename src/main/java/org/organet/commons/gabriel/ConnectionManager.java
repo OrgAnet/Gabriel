@@ -170,14 +170,18 @@ public class ConnectionManager {
       try {
         //Sending command "NEW" to inform peers that a new file is added.
         os = new OutputStreamWriter(c.getConnectionSocket().getOutputStream());
+        System.out.println("Sending " +  c.getConnectionIp() + " the command: " + command);
         os.write(command);
         os.flush();
       } catch (IOException e) {
         e.printStackTrace();
       }
       try {
-        Thread.sleep(700);
+        Thread.sleep(300);
+        System.out.println("Sending " +  c.getConnectionIp() + " the Shared File Object: " + sh.getFileName());
+
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(c.getConnectionSocket().getOutputStream() ));
+
         objectOutputStream.writeObject(sh);
         objectOutputStream.flush();
       } catch (IOException e) {

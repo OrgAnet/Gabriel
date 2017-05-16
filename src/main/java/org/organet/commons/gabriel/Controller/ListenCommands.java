@@ -41,7 +41,7 @@ public class ListenCommands extends Thread {
                 char[] buff = new char[3];
                 int output = bufferedInputStreamReader.read(buff,0,3);
                 commandOrFileFirstLine = new String(buff);
-                System.out.println("command received" + commandOrFileFirstLine);
+                System.out.println("command received " + commandOrFileFirstLine);
 
                 if (commandOrFileFirstLine.startsWith("GET")) {
                     //Send File
@@ -100,9 +100,11 @@ public class ListenCommands extends Thread {
                             try {
                                 sh = (SharedFileHeader) objectInputStream.readObject();
                                 if(!App.localIndex.containsName(sh.fileName)) {  //to prevent flooding, if exists, dont Add
-                                    System.out.println("NEW SharedFileHeader read successfully: " + sh.toString());
+                                    System.out.println("NEW SharedFileHeader added to index successfully: " + sh.toString());
                                     ConnectionManager.getNetworkIndex().add(sh);
                                     App.mainForm.getNetworkIndexListModel().addElement(sh.getScreenName());
+                                }else{
+                                    System.out.println("NEW SharedFileHeader already exists: " + sh.toString());
                                 }
                                 flag = false;
                             } catch (EOFException ex) {
