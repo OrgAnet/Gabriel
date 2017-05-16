@@ -175,7 +175,6 @@ public class Index implements Serializable {
     for (SharedFileHeader sh :
             this.getSharedFileHeaders()) {
       String sharedFileName = sh.getFileName();
-      //System.out.println("COMPARING: '" + sharedFileName + "' vs '" + selectedFileName +"'");
       if (sharedFileName == selectedFileName || selectedFileName.equals(sharedFileName) || sharedFileName.equals(selectedFileName)) {
         return sh;
       }

@@ -147,11 +147,7 @@ public class ConnectionManager {
   public static void sendNewSharedFiletoNetwork(SharedFileHeader sh) {
 
     // Create a shared file and add to the local index
-    try {
-      Thread.sleep(500);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+
     // filename MUST stay as it is, it is not the problem here
     // TODO Propagate new shared file to all connected nodes
 

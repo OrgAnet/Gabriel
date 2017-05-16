@@ -135,7 +135,11 @@ public class Watcher implements Runnable {
           // TODO Decide file type (DOCUMENT, IMAGE, VIDEO, AUDIO etc.) \
           // File types are implementation specific
 
-          if (kind == ENTRY_CREATE) {
+          if (kind == ENTRY_CREATE) {try {
+            Thread.sleep(4000);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
             SharedFileHeader sh = new SharedFileHeader(child.toString());
             ConnectionManager.sendNewSharedFiletoNetwork(sh);
             System.out.println("new Shared File: " + sh.toString());

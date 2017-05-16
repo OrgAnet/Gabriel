@@ -4,6 +4,7 @@ import org.organet.commons.gabriel.App;
 import org.organet.commons.gabriel.ConnectionManager;
 import org.organet.commons.gabriel.Controller.ListenCommands;
 import org.organet.commons.inofy.Index;
+import org.organet.commons.inofy.Model.SharedFileHeader;
 
 import javax.swing.*;
 import java.io.*;
@@ -56,8 +57,8 @@ public class Connection {
 
   public void requestFile(String fileName) {
     try {
-
-      if(App.localIndex.isContainsHash(ConnectionManager.getNetworkIndex().findIndex(fileName).getHash())){
+      SharedFileHeader sh = ConnectionManager.getNetworkIndex().findIndex(fileName);
+      if(App.localIndex.isContainsHash(sh.getHash())){
         JOptionPane.showMessageDialog(null, "This file already exist in Local Index");
         return;
       }
