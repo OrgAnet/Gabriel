@@ -74,7 +74,7 @@ public class ListenCommands extends Thread {
                     String chosenName = App.mainForm.getNetworkIndexListBox().getSelectedValue();
                     //create the file
                     String [] text=chosenName.split(" - ");
-                    File file = new File(text[1]);
+                    File file = new File(App.getSharedDirPath()+text[1]);
                     SharedFileHeader sharedFileHeader = ConnectionManager.getNetworkIndex().findIndex(text[1]);
                     //start receiving.
                     BufferedOutputStream bufferedFileOutputStream = new BufferedOutputStream(new FileOutputStream(file),1024) ;
@@ -91,6 +91,7 @@ public class ListenCommands extends Thread {
                     bufferedFileOutputStream.close();
                 }
                 else if(commandOrFileFirstLine.startsWith("NEW")){
+                    //new object is created on neighbour. And updating this node.
                     try {
                         ObjectInputStream objectInputStream = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
                         SharedFileHeader sh;
@@ -98,10 +99,11 @@ public class ListenCommands extends Thread {
                         while (flag) {
                             try {
                                 sh = (SharedFileHeader) objectInputStream.readObject();
-                                System.out.println("NEW SharedFileHeader read successfully: " + sh.toString());
-                                ConnectionManager.getNetworkIndex().add(sh);
-                                App.mainForm.getNetworkIndexListModel().addElement(sh.getScreenName());
-
+                                if(!App.localIndex.containsName(sh.fileName)) {  //to prevent flooding, if exists, dont Add
+                                    System.out.println("NEW SharedFileHeader read successfully: " + sh.toString());
+                                    ConnectionManager.getNetworkIndex().add(sh);
+                                    App.mainForm.getNetworkIndexListModel().addElement(sh.getScreenName());
+                                }
                                 flag = false;
                             } catch (EOFException ex) {
                                 flag = true;

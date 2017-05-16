@@ -136,43 +136,7 @@ public class Watcher implements Runnable {
           // File types are implementation specific
 
           if (kind == ENTRY_CREATE) {
-            // Create a shared file and add to the local index
-            try {
-              Thread.sleep(500);
-            } catch (InterruptedException e) {
-              e.printStackTrace();
-            }
-            SharedFileHeader sh = new SharedFileHeader(child.toString());
-            System.out.println("new Shared File: " + sh.toString());
-            App.localIndex.add(sh);
-            App.mainForm.LocalIndexListModel.addElement(filename.toString());
-            // FIXME Implement this behaviour in another way (i.e. anywhere else) \
-            // filename MUST stay as it is, it is not the problem here
-            // TODO Propagate new shared file to all connected nodes
-            ArrayList<Connection> conns = ConnectionManager.getConnections();
-            for (Connection c : conns) {
-              String command = "NEW";
-              OutputStreamWriter os = null;
-              try {
-                //Sending command "NEW" to inform peers that a new file is added.
-                os = new OutputStreamWriter(c.getConnectionSocket().getOutputStream());
-                os.write(command);
-                os.flush();
-              } catch (IOException e) {
-                e.printStackTrace();
-              }
-              try {
-                Thread.sleep(700);
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(c.getConnectionSocket().getOutputStream() ));
-                objectOutputStream.writeObject(sh);
-                objectOutputStream.flush();
-              } catch (IOException e) {
-                e.printStackTrace();
-              } catch (InterruptedException e) {
-                e.printStackTrace();
-              }
-            }
-
+            ConnectionManager.sendNewSharedFiletoNetwork(child, filename);
 
           } else if (kind == ENTRY_MODIFY) {
             // TODO Re-calculate the hash and update the local index

@@ -18,8 +18,6 @@ public class Index implements Serializable {
     this.isLocal = isLocal;
   }
 
-
-
   public ArrayList<SharedFileHeader> getSharedFileHeaders() {
     return sharedFileHeaders;
   }
@@ -35,7 +33,15 @@ public class Index implements Serializable {
         return true;
       }
     }
+    return false;
+  }
 
+  public boolean containsName(String fileName) {
+    for (SharedFileHeader sharedFileHeader : sharedFileHeaders) {
+      if (sharedFileHeader.getFileName().equals(fileName)) {
+        return true;
+      }
+    }
     return false;
   }
 
