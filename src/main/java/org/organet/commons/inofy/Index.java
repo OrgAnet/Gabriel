@@ -55,7 +55,6 @@ public class Index implements Serializable {
   }
 
   public boolean add(SharedFileHeader sharedFileHeader) {
-    sharedFileHeader.setNDNid(getNDNcount());
     return sharedFileHeaders.add(sharedFileHeader);
   }
 
@@ -147,7 +146,6 @@ public class Index implements Serializable {
     keyword=keyword.toLowerCase();
 
     for (SharedFileHeader sharedFileHeader : sharedFileHeaders) {
-
       for (String key : sharedFileHeader.getKeywords()) {
         if(key.toLowerCase().contains(keyword)) {
           foundSharedFileHeaders.add(sharedFileHeader);

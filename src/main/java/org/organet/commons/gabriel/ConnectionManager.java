@@ -86,11 +86,8 @@ public class ConnectionManager {
         }
       }
       System.out.println("Index read successfully: " + remoteIndex.toString());
-      conn.setConnectionIndex(remoteIndex);
       networkIndex.addAllSharedFiles(remoteIndex);
-      for (SharedFileHeader sh : networkIndex.getSharedFileHeaders()) {
-        conn.getConnectionIndex().add(sh);
-      }
+
     } catch (IOException e) {
       e.printStackTrace();
     } catch (ClassNotFoundException e) {
@@ -144,7 +141,6 @@ public class ConnectionManager {
       System.out.println("Error file not specified");
       return;
     }
-
     connections.get(0).requestFile(selectedFileName);   //first find IP to decide who to ask.
   }
 

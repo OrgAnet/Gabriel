@@ -1,8 +1,11 @@
 package org.organet.commons.gabriel.Model;
 
+import org.organet.commons.gabriel.App;
+import org.organet.commons.gabriel.ConnectionManager;
 import org.organet.commons.gabriel.Controller.ListenCommands;
 import org.organet.commons.inofy.Index;
 
+import javax.swing.*;
 import java.io.*;
 import java.net.Inet4Address;
 import java.net.ServerSocket;
@@ -13,20 +16,9 @@ public class Connection {
 
   Socket connectionSocket;
 
-  Index connectionIndex;
-
   OutputStream os;
   InputStream is;
   ListenCommands listenCommands;
-
-
-  public Index getConnectionIndex() {
-    return connectionIndex;
-  }
-
-  public void setConnectionIndex(Index connectionIndex) {
-    this.connectionIndex = connectionIndex;
-  }
 
   public Connection(Socket connectionSocket) {
     this.connectionSocket = connectionSocket;
@@ -64,6 +56,11 @@ public class Connection {
 
   public void requestFile(String fileName) {
     try {
+
+      if(App.localIndex.isContainsHash(ConnectionManager.getNetworkIndex().findIndex(fileName).getHash())){
+        JOptionPane.showMessageDialog(null, "This file already exist in Local Index");
+        return;
+      }
 
       System.out.println(connectionSocket);
       OutputStreamWriter os = new OutputStreamWriter(connectionSocket.getOutputStream());
