@@ -144,19 +144,14 @@ public class ConnectionManager {
     connections.get(0).requestFile(selectedFileName);   //first find IP to decide who to ask.
   }
 
-  public static void sendNewSharedFiletoNetwork(Path child, Path fileName) {
+  public static void sendNewSharedFiletoNetwork(SharedFileHeader sh) {
 
     // Create a shared file and add to the local index
     try {
-      Thread.sleep(500);
+      Thread.sleep(300);
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    SharedFileHeader sh = new SharedFileHeader(child.toString());
-    System.out.println("new Shared File: " + sh.toString());
-    App.localIndex.add(sh);
-    App.mainForm.LocalIndexListModel.addElement(fileName.toString());
-    // FIXME Implement this behaviour in another way (i.e. anywhere else) \
     // filename MUST stay as it is, it is not the problem here
     // TODO Propagate new shared file to all connected nodes
 
@@ -174,7 +169,7 @@ public class ConnectionManager {
       }
       try {
         Thread.sleep(300);
-        System.out.println("Sending " +  c.getConnectionIp() + " the Shared File Object: " + sh.getFileName());
+        System.out.println("Sending to " +  c.getConnectionIp() + " the Shared File Object: " + sh.getFileName());
 
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(c.getConnectionSocket().getOutputStream() ));
 

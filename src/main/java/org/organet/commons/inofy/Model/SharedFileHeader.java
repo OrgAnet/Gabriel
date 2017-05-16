@@ -46,13 +46,11 @@ public class SharedFileHeader extends File implements Serializable {
   public SharedFileHeader(String pathname) {
     super(pathname);
     localPath = pathname;
-
     initialize();
   }
 
   public SharedFileHeader(String parent, String child) {
     super(parent, child);
-
     initialize();
   }
 

@@ -2,9 +2,12 @@ package org.organet.commons.gabriel.Controller;
 
 import org.organet.commons.gabriel.App;
 import org.organet.commons.gabriel.ConnectionManager;
+import org.organet.commons.gabriel.Helper;
+import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.inofy.Model.SharedFileHeader;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 
 /**
@@ -117,9 +120,21 @@ public class ListenCommands extends Thread {
                 try {
                     sh = (SharedFileHeader) objectInputStream.readObject();
                     if(!App.localIndex.isContainsHash(sh.getHash())) {  //to prevent flooding, if exists, dont Add
+
                         System.out.println("NEW SharedFileHeader added to index successfully: " + sh.toString());
+                        sh.setNDNid(ConnectionManager.getNetworkIndex().getNDNcount());
+
+                        sh.setIp(socket.getInetAddress().toString());  //Set Ip to received node.
+
                         ConnectionManager.getNetworkIndex().add(sh);
                         App.mainForm.getNetworkIndexListModel().addElement(sh.getScreenName());
+
+                        //Propagation to other nodes.
+//                        SharedFileHeader propagateHeader = sh;
+//                        propagateHeader.setIp("1.1.1.1");
+                        //propagateHeader.setIp( InetAddress.getLocalHost().getHostAddress().toString());
+                        ConnectionManager.sendNewSharedFiletoNetwork(sh);
+
                     }else{
                         System.out.println("NEW SharedFileHeader already exists: " + sh.toString());
                     }

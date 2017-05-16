@@ -136,7 +136,11 @@ public class Watcher implements Runnable {
           // File types are implementation specific
 
           if (kind == ENTRY_CREATE) {
-            ConnectionManager.sendNewSharedFiletoNetwork(child, filename);
+            SharedFileHeader sh = new SharedFileHeader(child.toString());
+            ConnectionManager.sendNewSharedFiletoNetwork(sh);
+            System.out.println("new Shared File: " + sh.toString());
+            App.localIndex.add(sh);
+            App.mainForm.LocalIndexListModel.addElement(sh.getFileName());
 
           } else if (kind == ENTRY_MODIFY) {
             // TODO Re-calculate the hash and update the local index
