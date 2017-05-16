@@ -37,9 +37,9 @@ public class ListenCommands extends Thread {
 
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(socket.getOutputStream());
 
-            System.out.println("waiting to Listen command");
             String commandOrFileFirstLine;
             while(true) {
+                System.out.println("waiting to Listen command");
                 char[] buff = new char[3];
                 int output = bufferedInputStreamReader.read(buff,0,3);
                 commandOrFileFirstLine = new String(buff);
@@ -101,16 +101,17 @@ public class ListenCommands extends Thread {
             Connection sourceConnection = ConnectionManager.getConnection(sourceIp); /// find file source and receive from there and send to requested node.
             sourceConnection.requestFile(sharedFileHeader.fileName);
             redirectFile(sharedFileHeader, sourceConnection.getConnectionSocket(), socket);
-
         }
-
-
     }
 
     private void redirectFile(SharedFileHeader sh, Socket sourceSocket, Socket destinationSocket) {
-
-        try {
+       try {
+           System.out.println("\nredirecting file :"+sh+" from " + sourceSocket.getInetAddress() + " to " + destinationSocket.getInetAddress());
+           //Thread.sleep(1000);
+            char[] buff = new char[3];
             BufferedReader bufferedInputStreamReader = new BufferedReader( new InputStreamReader(sourceSocket.getInputStream()));
+            int output = bufferedInputStreamReader.read(buff,0,3);
+            System.out.println(new String (buff) + " command to send file is received. Sending file now.");
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(destinationSocket.getOutputStream());
 
             int c;
@@ -121,11 +122,10 @@ public class ListenCommands extends Thread {
                 x++;
             }while(x < sh.getSize());
             outputStreamWriter.flush();
-        } catch (IOException e) {
+           System.out.println(x + " bytes redirected");
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     private void receiveNewFile(BufferedReader bufferedInputStreamReader) throws IOException {

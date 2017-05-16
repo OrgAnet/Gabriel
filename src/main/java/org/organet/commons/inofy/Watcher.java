@@ -172,8 +172,9 @@ public class Watcher implements Runnable {
 
       RandomAccessFile stream = null;
       try {
-        //Thread.sleep(1000);
+        Thread.sleep(1000);
         stream = new RandomAccessFile(file, "rw");
+        Thread.sleep(1000);
         return true;
       } catch (Exception e) {
         System.out.println("Skipping file " + file.getName() + " for this iteration due it's not completely written");
