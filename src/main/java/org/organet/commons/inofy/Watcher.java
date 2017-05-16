@@ -5,10 +5,7 @@ import org.organet.commons.gabriel.ConnectionManager;
 import org.organet.commons.gabriel.Model.Connection;
 import org.organet.commons.inofy.Model.SharedFileHeader;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -135,11 +132,9 @@ public class Watcher implements Runnable {
           // TODO Decide file type (DOCUMENT, IMAGE, VIDEO, AUDIO etc.) \
           // File types are implementation specific
 
-          if (kind == ENTRY_CREATE) {try {
-            Thread.sleep(4000);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-          }
+          if (kind == ENTRY_CREATE) {
+            isCompletelyWritten(child.toFile());
+
             SharedFileHeader sh = new SharedFileHeader(child.toString());
             ConnectionManager.sendNewSharedFiletoNetwork(sh);
             System.out.println("new Shared File: " + sh.toString());
@@ -171,4 +166,27 @@ public class Watcher implements Runnable {
       }
     }
   }
+
+  private boolean isCompletelyWritten(File file) {
+    while(true){
+
+      RandomAccessFile stream = null;
+      try {
+        //Thread.sleep(1000);
+        stream = new RandomAccessFile(file, "rw");
+        return true;
+      } catch (Exception e) {
+        System.out.println("Skipping file " + file.getName() + " for this iteration due it's not completely written");
+      } finally {
+        if (stream != null) {
+          try {
+            stream.close();
+          } catch (IOException e) {
+            System.out.println("Exception during closing file " + file.getName());
+          }
+        }
+      }
+    }
+  }
+
 }

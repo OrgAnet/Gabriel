@@ -153,7 +153,7 @@ public class ConnectionManager {
 
     for (Connection c : getConnections()) {
       System.out.println("Comparing *" +c.getConnectionIp().toString() + "* ?= *" + sh.getIp()+"*");
-      if(c.getConnectionIp().toString().equals(sh.getIp())){
+      if(c.getConnectionIp().toString().equals("/"+sh.getIp())){
         continue;
       }
 
