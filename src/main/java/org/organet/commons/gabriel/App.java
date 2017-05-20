@@ -27,7 +27,7 @@ public class App {
   final static String SUBNET = "192.168.1"; // 10.253.74
   static String sharedDirPath;
   public static Index localIndex = null;
-
+  private static String localIp;
   private static ArrayList<Node> nodeList;
   private static Introducer introducer;
   private static ConnectionManager connectionManager; // TODO
@@ -43,15 +43,20 @@ public class App {
 
       return;
     }
-
     calculatePossibleHostsCount();
-
     nodeList = new ArrayList<>();
     introducer = new Introducer(nodeList);
     connectionManager = new ConnectionManager();
 
     mainForm = new MainForm();
     mainForm.setVisible(true);
+
+    try {
+      localIp = InetAddress.getLocalHost().getHostAddress().toString();
+      mainForm.IPLabel.setText("Your Ip Address is: "+ localIp + " and server is listening on port: "+ connectionManager.getPORT_NO());
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
 
     sharedDirPath = args[0];
     File sharedDir = new File(sharedDirPath);

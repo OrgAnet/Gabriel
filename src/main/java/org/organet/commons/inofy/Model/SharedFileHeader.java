@@ -17,15 +17,12 @@ import java.util.List;
 public class SharedFileHeader extends File implements Serializable {
   private Integer ndnid = null; // Named Data Network Identifier
   private String ndntype = null; // Named Data Network File Type
-  private transient String localPath = null; // Absolute path of the file, MUST be set by Watcher,
+  private transient String localPath = null; // Absolute path of the file
   private transient long lastModified = -1;
   private String hash = null;
-  private Long size= Long.valueOf(0);
-
+  private Long size;
   public String fileName;
-
   private String ip;
-
   private ArrayList<String> keywords = new ArrayList<>();
 
 

@@ -18,20 +18,9 @@ import java.util.logging.Logger;
 public class ConnectionManager {
   private static ArrayList<Connection> connections = new ArrayList<>();
   private final static Integer PORT_NO = 5001;
-
-  public static ArrayList<Connection> getConnections() {
-    return connections;
-  }
-
-  public static void setConnections(ArrayList<Connection> connections) {
-    ConnectionManager.connections = connections;
-  }
+  private static String localIp;
 
   static Index networkIndex = new Index(false);
-
-  public Integer getPORT_NO() {
-    return PORT_NO;
-  }
 
   public static void startServer() {
     try {
@@ -87,7 +76,6 @@ public class ConnectionManager {
       }
       System.out.println("Index read successfully: " + remoteIndex.toString());
       networkIndex.addAllSharedFiles(remoteIndex);
-
     } catch (IOException e) {
       e.printStackTrace();
     } catch (ClassNotFoundException e) {
@@ -95,18 +83,6 @@ public class ConnectionManager {
     }
   }
 
-  public static void broadcastLocalIndex() {
-    //TODO send local index to all connections
-  }
-
-
-  public static Index getNetworkIndex() {
-    return networkIndex;
-  }
-
-  public void setNetworkIndex(Index networkIndex) {
-    this.networkIndex = networkIndex;
-  }
 
   public static Connection createConnection(Inet4Address connectionIp) {
     try {
@@ -147,10 +123,6 @@ public class ConnectionManager {
   public static void sendNewSharedFiletoNetwork(SharedFileHeader sh) {
 
     // Create a shared file and add to the local index
-
-    // filename MUST stay as it is, it is not the problem here
-    // TODO Propagate new shared file to all connected nodes
-
     for (Connection c : getConnections()) {
       System.out.println("Comparing *" +c.getConnectionIp().toString() + "* ?= *" + sh.getIp()+"*");
       if(c.getConnectionIp().toString().equals("/"+sh.getIp())){
@@ -191,4 +163,37 @@ public class ConnectionManager {
       }
       return  null;
   }
+
+  public static Integer getPortNo() {
+    return PORT_NO;
+  }
+
+  public static String getLocalIp() {
+    return localIp;
+  }
+
+  public static void setLocalIp(String localIp) {
+    ConnectionManager.localIp = localIp;
+  }
+
+  public static ArrayList<Connection> getConnections() {
+    return connections;
+  }
+
+  public static void setConnections(ArrayList<Connection> connections) {
+    ConnectionManager.connections = connections;
+  }
+
+  public Integer getPORT_NO() {
+    return PORT_NO;
+  }
+
+  public static Index getNetworkIndex() {
+    return networkIndex;
+  }
+
+  public void setNetworkIndex(Index networkIndex) {
+    this.networkIndex = networkIndex;
+  }
+
 }
