@@ -15,16 +15,16 @@ public class HostChecker extends Thread {
   }
   @Override
   public void run() {
-    try {
-      if (InetAddress.getByName(hostName).isReachable(timeout)) {
-        System.out.println(hostName + " is reachable ");
-        this.isValid = true;
-      } else {
-        this.isValid = false;
+      try {
+        if (InetAddress.getByName(hostName).isReachable(timeout)) {
+          System.out.println(hostName + " is reachable ");
+          this.isValid = true;
+        } else {
+          this.isValid = false;
+        }
+      } catch (IOException ex) {
+        Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
       }
-    } catch (IOException ex) {
-      Logger.getLogger(Introducer.class.getName()).log(Level.SEVERE, null, ex);
-    }
   }
 
 }
