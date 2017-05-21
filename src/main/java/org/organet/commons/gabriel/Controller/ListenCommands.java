@@ -45,6 +45,11 @@ public class ListenCommands extends Thread {
                 commandOrFileFirstLine = new String(buff);
                 System.out.println("command received " + commandOrFileFirstLine);
 
+                if (commandOrFileFirstLine.equals("\0\0\0")) {
+                    System.out.format("Connection lost (%s)\n", socket.getInetAddress());
+                    break;
+                }
+
                 if (commandOrFileFirstLine.startsWith("GET")) {
                     //Send File
                     sendFile(bufferedInputStreamReader, outputStreamWriter);
