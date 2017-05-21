@@ -1,5 +1,6 @@
 package org.organet.commons.inofy.Model;
 
+import org.organet.commons.gabriel.App;
 import org.organet.commons.inofy.FileTypes;
 import org.organet.commons.inofy.Hasher;
 
@@ -31,14 +32,15 @@ public class SharedFileHeader extends File implements Serializable {
     keywords.add(getName());
     keywords.add(ndntype);
     fileName = getName();
-    try {
-      String ipd = InetAddress.getLocalHost().getHostAddress().toString();
+//    try {
+      String ipd = App.localIp;
+//      String ipd = InetAddress.getLocalHost().getHostAddress().toString();
       if(ipd.startsWith("\\"))
         ip =ipd.substring(1) ;
       else ip = ipd;
-    } catch (UnknownHostException e) {
-      e.printStackTrace();
-    }
+//    } catch (UnknownHostException e) {
+//      e.printStackTrace();
+//    }
     hash = getHash();
     size = length();
   }

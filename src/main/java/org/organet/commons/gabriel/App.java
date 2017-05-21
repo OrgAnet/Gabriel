@@ -8,14 +8,13 @@ import org.organet.commons.inofy.Watcher;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,7 +26,7 @@ public class App {
   final static String SUBNET = "192.168.1"; // 10.253.74
   static String sharedDirPath;
   public static Index localIndex = null;
-  private static String localIp;
+  public static String localIp;
   private static ArrayList<Node> nodeList;
   private static Introducer introducer;
   private static ConnectionManager connectionManager; // TODO
@@ -38,8 +37,8 @@ public class App {
   public static SharedFileHeader chosenSharedFileHeader;
 
   public static void main(String args[]) {
-    if (args.length < 1) {
-      System.out.println("Shared directory path is missing, first argument must be a valid path.");
+    if (args.length < 2) {
+      System.out.println("Shared directory path and/or IP address is missing, first argument must be a valid path.");
 
       return;
     }
@@ -51,16 +50,23 @@ public class App {
     mainForm = new MainForm();
     mainForm.setVisible(true);
 
-    try {
-      localIp = InetAddress.getLocalHost().getHostAddress().toString();
+//    try {
+//      localIp = InetAddress.getLocalHost().getHostAddress().toString();
+      localIp = args[0];
       mainForm.IPLabel.setText("Your Ip Address is: "+ localIp + " and server is listening on port: "+ connectionManager.getPORT_NO());
-    } catch (UnknownHostException e) {
-      e.printStackTrace();
-    }
+//    } catch (UnknownHostException e) {
+//      e.printStackTrace();
+//    }
 
-    sharedDirPath = args[0];
+    sharedDirPath = args[1];
     File sharedDir = new File(sharedDirPath);
     localIndex = new Index(true);
+
+    // Watch the shared directory directory recursively for changes
+
+    App.startWatcherExecutor( sharedDir);
+
+    App.startServerExecutor();
 
     // Walk shared directory for initial indexing
     try(Stream<Path> paths = Files.walk(Paths.get(sharedDirPath))) {
@@ -77,12 +83,6 @@ public class App {
 
       return;
     }
-
-    // Watch the shared directory directory recursively for changes
-
-      App.startWatcherExecutor( sharedDir);
-
-      App.startServerExecutor();
 
   }
 
