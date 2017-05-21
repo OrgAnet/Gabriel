@@ -51,9 +51,7 @@ public class App {
     mainForm = new MainForm();
     mainForm.setVisible(true);
 
-//    try {
 //      localIp = InetAddress.getLocalHost().getHostAddress().toString();
-      localIp = args[0];
       mainForm.IPLabel.setText("Your Ip Address is: "+ localIp + " and server is listening on port: "+ connectionManager.getPORT_NO());
 //    } catch (UnknownHostException e) {
 //      e.printStackTrace();
