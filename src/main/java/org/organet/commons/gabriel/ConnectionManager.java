@@ -32,7 +32,7 @@ public class ConnectionManager {
         Socket neighbourConnectionSocket = serverSocket.accept();
         Connection newIncomingConnection = new Connection(neighbourConnectionSocket);
 
-        sendIndex(newIncomingConnection, App.localIndex);
+        sendIndex(newIncomingConnection);
         getRemoteIndex(newIncomingConnection);
 
         connections.add(newIncomingConnection);
@@ -50,7 +50,16 @@ public class ConnectionManager {
     }
   }
 
-  public static void sendIndex(Connection connection, Index myIndex) {
+  public static void sendIndex(Connection connection) {
+    Index myIndex = App.localIndex;
+    for (SharedFileHeader sh :
+            ConnectionManager.networkIndex.getSharedFileHeaders()) {
+      if(!connection.getConnectionIp().toString().contains(sh.getIp())) {
+        sh.setIp(App.localIp);
+        myIndex.add(sh);
+      }
+    }
+
     ObjectOutputStream objectOS = null;
     try {
       objectOS = new ObjectOutputStream(new BufferedOutputStream(connection.getConnectionSocket().getOutputStream()));
@@ -90,7 +99,7 @@ public class ConnectionManager {
       final Connection newConnection = new Connection(new Socket(connectionIp.getHostAddress(), PORT_NO));
 
       getRemoteIndex(newConnection);
-      sendIndex(newConnection, App.localIndex);
+      sendIndex(newConnection);
 
       connections.add(newConnection);
       App.mainForm.getConnectionListModel().addElement(newConnection.getConnectionIp().toString());
