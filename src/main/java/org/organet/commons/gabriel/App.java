@@ -9,6 +9,7 @@ import org.organet.commons.inofy.Watcher;
 import java.io.File;
 import java.io.IOException;
 import java.net.*;
+import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -54,6 +55,9 @@ public class App {
       mainForm.IPLabel.setText("Your Ip Address is: "+ localIp + " and server is listening on port: "+ connectionManager.getPORT_NO());
 
     sharedDirPath = args[1];
+    if (!sharedDirPath.endsWith(File.separator)) {
+      sharedDirPath += File.separator;
+    }
     File sharedDir = new File(sharedDirPath);
     localIndex = new Index(true);
 
