@@ -5,15 +5,14 @@
  */
 package gabriel.models;
 
-import gabriel.Controller.Hasher;
-import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import gabriel.Controller.Hasher;
 
 /**
  *
@@ -21,7 +20,8 @@ import java.util.logging.Logger;
  */
 public class SharedFileHeader implements Serializable{
 
-    private String name = "";
+	private static final long serialVersionUID = 2716422227965416854L;
+	private String name = "";
     private String path = null;
     private String mimeType = null;
     private String hash = null;
@@ -36,9 +36,6 @@ public class SharedFileHeader implements Serializable{
         this.name = name;
     }
 
-    
-    
-    
     public String getPath() {
         return path;
     }
