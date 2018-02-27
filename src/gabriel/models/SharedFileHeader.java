@@ -28,6 +28,18 @@ public class SharedFileHeader implements Serializable{
     private Long size = null;
     private Long lastModified = null;
 
+    public String getHashValue(){
+    	try {
+    		hash = Hasher.calculateFileHash(this.getPath());
+    		return hash;
+    	} catch (IOException ex) {
+    		Logger.getLogger(SharedFileHeader.class.getName()).log(Level.SEVERE, null, ex);
+    	} catch (NoSuchAlgorithmException ex) {
+    		Logger.getLogger(SharedFileHeader.class.getName()).log(Level.SEVERE, null, ex);
+    	}
+    	return hash;
+    }
+
     public String getName() {
         return name;
     }
@@ -76,17 +88,6 @@ public class SharedFileHeader implements Serializable{
         this.lastModified = lastModified;
     }
 
-    public String getHashValue(){
-        try {
-            hash = Hasher.calculateFileHash(this.getPath());
-            return hash;
-        } catch (IOException ex) {
-            Logger.getLogger(SharedFileHeader.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(SharedFileHeader.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return hash;
-    }
 
     @Override
     public boolean equals(Object obj) {

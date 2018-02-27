@@ -5,16 +5,15 @@
  */
 package gabriel;
 
-import gabriel.Controller.Introducer;
-import gabriel.models.Node;
-import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import gabriel.Controller.Introducer;
+import gabriel.models.Node;
 
 /**
  *
@@ -31,6 +30,21 @@ public class Gabriel {
     private Introducer mainIntroducer;
     private ConnectionManager connectionManager;
 
+    public Node getNode(String ipAddress) {
+        for (Node node : nodeList) {
+            if (node.getConnectionIp().toString().equals(ipAddress)) {
+                return node;
+            }
+        }
+        try {
+            System.out.println("gelen ip `" + ipAddress + "`");
+            return new Node((Inet4Address) InetAddress.getByName(ipAddress));
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(Gabriel.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
     public ArrayList<Node> getNodeList() {
         return nodeList;
     }
@@ -51,21 +65,6 @@ public class Gabriel {
         nodeList = new ArrayList<>();
         mainIntroducer = new Introducer(nodeList);
         connectionManager = new ConnectionManager();
-    }
-
-    public Node getNode(String ipAddress) {
-        for (Node node : nodeList) {
-            if (node.getConnectionIp().toString().equals(ipAddress)) {
-                return node;
-            }
-        }
-        try {
-            System.out.println("gelen ip `" + ipAddress + "`");
-            return new Node((Inet4Address) InetAddress.getByName(ipAddress));
-        } catch (UnknownHostException ex) {
-            Logger.getLogger(Gabriel.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
-        }
     }
 
     public ArrayList<Node> getNodes() {
